@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Spring Boot HTML Interface</title>
+</head>
+<body>
+    <h1>Spring Boot HTML Interface</h1>
+    <form action="/execute" method="post">
+        <button type="submit" name="action" value="action1">Ejecutar Acción 1</button>
+        <button type="submit" name="action" value="action2">Ejecutar Acción 2</button>
+    </form>
+    <div>
+        <h2>Resultado:</h2>
+        <p th:text="${result}"></p>
+    </div>
+</body>
+</html>
