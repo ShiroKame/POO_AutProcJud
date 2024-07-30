@@ -7,24 +7,14 @@ import java.io.*;
 
 public class BddEditor {
 
-    public void agregarRadicado() {
-        String radicadoFinal = "";
+    public void agregarRadicado(String number) {
+        String radicadoFinal = number;
 
-        // Crear un nuevo BufferedReader en cada llamada a agregarRadicado
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
-            System.out.print("Ingrese el numero de radicado: ");
-            String numRad = reader.readLine();
 
-            // Filtrar los dígitos de la entrada
-            for (char c : numRad.toCharArray()) {
-                if (Character.isDigit(c)) {
-                    radicadoFinal += c;
-                }
-            }
 
             if (radicadoFinal.length() == 23) {
                 // Usa una ruta absoluta para el archivo Excel
-                File excelFile = new File("E:/Desktop/OLLAMA/Libro.xlsx");
+                File excelFile = new File("C:/Users/PC/Desktop/Probando/Libro.xlsx");
 
                 try (FileInputStream fis = new FileInputStream(excelFile);
                      Workbook workbook = new XSSFWorkbook(fis)) {
@@ -72,8 +62,5 @@ public class BddEditor {
                 System.out.println("No se puede registrar el número digitado, ya que debería tener 23 cifras");
             }
 
-        } catch (IOException e) {
-            System.out.println("Error al leer la entrada del usuario: " + e.getMessage());
-        }
     }
 }

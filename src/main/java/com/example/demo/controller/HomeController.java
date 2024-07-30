@@ -29,8 +29,13 @@ public class HomeController {
 
         if ("action1".equals(action)) {
             try {
-                bddEditor.agregarRadicado();
-                result = "Acción 1 ejecutada con éxito!";
+                if (radNumber != null && !radNumber.isEmpty()) {
+                    radNumber = radNumber.toString();
+                    bddEditor.agregarRadicado(radNumber);
+                    result = "Acción 1 ejecutada con éxito!";
+                } else {
+                    result = "Número de radicado no proporcionado!";
+                }
             } catch (Exception e) {
                 result = "Error al ejecutar Acción 1: " + e.getMessage();
             }
