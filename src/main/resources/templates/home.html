@@ -1,40 +1,144 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
+  <head>
     <title>Spring Boot HTML Interface</title>
-</head>
-<body>
-    <h1>Spring Boot HTML Interface</h1>
-    <form action="/execute" method="post">
+    <link rel="stylesheet" href="http://localhost:8080/home.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css    "
+    />
+    <style>
+      body {
+        min-height: 100vh;
+        background: url('http://localhost:8080/14547779_rm222-mind-14.svg');
+        background-size: cover;
+        background-repeat: repeat;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      .title-app {
+        height: 60px;
+        color: rgb(0, 106, 255);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .container .result-container {
+        display: none;
+      }
+
+      .container .show {
+        display: block;
+      }
+
+      .table-container {
+        max-height: 1000px;
+        overflow: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <h1 class="title-app bg-black">TemmisApp</h1>
+    <div class="container">
+      <div class="form-container mt-4">
+        <form action="/execute" method="post">
+          <div class="mb-3">
+            <label for="numeroRadicado" class="form-label fw-bold"
+              >Número de radicado</label
+            >
+            <input
+              type="text"
+              class="form-control mb-3"
+              aria-describedby="emailHelp"
+              id="radNumber"
+              name="radNumber"
+              required
+            />
+            <div
+              class="btn-group w-100 shadow"
+              role="group"
+              aria-label="Basic example"
+            >
+              <button
+                type="submit"
+                class="btn btn-primary"
+                name="action"
+                value="action1"
+                id="accion1"
+              >
+                Guardar
+              </button>
+              <button
+                type="submit"
+                class="btn btn-primary"
+                name="action"
+                value="action2"
+                id="accion2"
+              >
+                Buscar en La rama
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="">
         <div>
-            <label for="radNumber">Número de Radicado:</label>
-            <input type="text" id="radNumber" name="radNumber" required>
+          <h2>Resultado:</h2>
+          <p th:text="${result}"></p>
         </div>
-        <button type="submit" name="action" value="action1">Ejecutar Acción 1</button>
-        <button type="submit" name="action" value="action2">Buscar en La rama</button>
-    </form>
-    <div>
-        <h2>Resultado:</h2>
-        <p th:text="${result}"></p>
+        <div th:if="${process != null}">
+          <h2>Detalles del Proceso:</h2>
+          <p>
+            <span class="fw-bold">Clave del Proceso:</span>
+
+            <span th:text="${process.process.key_procces}"></span>
+          </p>
+          <p>
+            <span class="fw-bold">Fuente:</span
+            ><span th:text="${process.process.source}"></span>
+          </p>
+          <p>
+            <span class="fw-bold">Fecha de Radicación:</span>
+            <span th:text="${process.process.radication_date}"></span>
+          </p>
+          <p>
+            <span class="fw-bold">Oficina:</span
+            ><span th:text="${process.process.office}"></span>
+          </p>
+          <p>
+            <span class="fw-bold">Ponente: </span
+            ><span th:text="${process.process.speaker}"></span>
+          </p>
+          <h3>Acciones:</h3>
+
+          <div class="table-container">
+            <table class="table table-warning table-striped rounded-2 shadow">
+              <thead>
+                <th scope="col">Fecha de Acción</th>
+                <th scope="col">Acción</th>
+                <th scope="col">Anotación</th>
+                <th scope="col">Fecha Inicial</th>
+                <th scope="col">Fecha Final</th>
+                <th scope="col">Fecha de Registro</th>
+              </thead>
+              <tbody th:each="action : ${process.process.actions}">
+                <td th:text="${action.action_date}"></td>
+                <td th:text="${action.action}"></td>
+                <td th:text="${action.annotation}"></td>
+                <td th:text="${action.start_date}"></td>
+                <td th:text="${action.end_date}"></td>
+                <td th:text="${action.registration_date}"></td>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </div>
-    <div th:if="${process != null}">
-        <h2>Detalles del Proceso:</h2>
-        <p>Clave del Proceso: <span th:text="${process.process.key_procces}"></span></p>
-        <p>Fuente: <span th:text="${process.process.source}"></span></p>
-        <p>Fecha de Radicación: <span th:text="${process.process.radication_date}"></span></p>
-        <p>Oficina: <span th:text="${process.process.office}"></span></p>
-        <p>Ponente: <span th:text="${process.process.speaker}"></span></p>
-        <h3>Acciones:</h3>
-        <ul>
-            <li th:each="action : ${process.process.actions}">
-                Fecha de Acción: <span th:text="${action.action_date}"></span> - 
-                Acción: <span th:text="${action.action}"></span> - 
-                Anotación: <span th:text="${action.annotation}"></span> - 
-                Fecha Inicial: <span th:text="${action.start_date}"></span> - 
-                Fecha Final: <span th:text="${action.end_date}"></span> - 
-                Fecha de Registro: <span th:text="${action.registration_date}"></span>
-            </li>
-        </ul>
-    </div>
-</body>
+  </body>
 </html>
