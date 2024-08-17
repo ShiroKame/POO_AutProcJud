@@ -86,7 +86,7 @@ public class AdminController {
             // Si el nombre de usuario ya existe, mostrar un mensaje de error en la vista
             System.err.println("ya existe ese");
             model.addAttribute("error", "El nombre de usuario ya existe. Por favor, elija otro.");
-            return "accesspanel"; // Volver a la vista de edición de usuarios
+            return "redirect:/admin/accesspanel"; // Volver a la vista de edición de usuarios
         }
 
         // Crear un nuevo usuario

@@ -35,12 +35,6 @@ public class SecurityConfig {
                 .requestMatchers("/login").permitAll()
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 .requestMatchers("/user/**").hasAnyRole("USER", "ADMIN")
-                //.requestMatchers("/login").permitAll()
-                //.requestMatchers("/admin/**").hasRole("ADMIN")
-                //.requestMatchers("/execute").hasRole("ADMIN")
-                //.requestMatchers("/admin/execute").hasRole("ADMIN")
-                //.requestMatchers("/admin/accesspanel").hasRole("ADMIN")
-                //.requestMatchers("/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
