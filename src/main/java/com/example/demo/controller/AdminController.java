@@ -83,7 +83,7 @@ public class AdminController {
         User user = new User();
         user.setUsername(username);
         user.setPassword(passwordEncoder.encode(password)); // Encode the password
-
+        System.err.println(role);
         // Find the role
         Optional<Role> optionalRole = roleRepository.findByName(role);
         if (optionalRole.isEmpty()) {
