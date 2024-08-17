@@ -62,6 +62,6 @@ public class HomeController {
         }
 
         model.addAttribute("result", result);
-        return "home"; // Return to the user-specific view (not adminHome)
+        return "adminhome"; // Return to the user-specific view (not adminHome)
     }
 }
