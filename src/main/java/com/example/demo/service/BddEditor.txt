@@ -1,0 +1,111 @@
+package com.example.demo.service;
+
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import java.io.*;
+
+public class BddEditor {
+
+    public void agregarRadicado(String number) {
+        String radicadoFinal = number;
+
+        if (radicadoFinal.length() == 23) {
+            // Usa una ruta absoluta para el archivo Excel y el archivo SQL
+            File excelFile = new File("E:/Desktop/OLLAMA/libro.xlsx");
+            File sqlFile = new File("E:/Desktop/OLLAMA/insert_data.sql");
+
+            // Crear el archivo SQL si no existe
+            try {
+                if (!sqlFile.exists()) {
+                    sqlFile.createNewFile();
+                }
+            } catch (IOException e) {
+                System.out.println("Error al crear el archivo SQL: " + e.getMessage());
+                return;
+            }
+
+            try (FileInputStream fis = new FileInputStream(excelFile);
+                 Workbook workbook = new XSSFWorkbook(fis);
+                 FileWriter fw = new FileWriter(sqlFile, true); // Append mode
+                 BufferedWriter bw = new BufferedWriter(fw)) {
+
+                Sheet sheet = workbook.getSheetAt(0); // Asume que los datos están en la primera hoja
+                Row headerRow = sheet.getRow(0);
+                int radicadoColumnIndex = -1;
+
+                // Encuentra el índice de la columna "RADICADO"
+                for (Cell cell : headerRow) {
+                    if (cell.getStringCellValue().trim().equalsIgnoreCase("RADICADO")) {
+                        radicadoColumnIndex = cell.getColumnIndex();
+                        break;
+                    }
+                }
+
+                if (radicadoColumnIndex != -1) {
+                    // Recorre todas las filas (excepto la primera fila que es el encabezado)
+                    for (int rowIndex = 1; rowIndex <= sheet.getLastRowNum(); rowIndex++) {
+                        Row row = sheet.getRow(rowIndex);
+                        if (row != null) {
+                            String radicado = row.getCell(radicadoColumnIndex) != null ? row.getCell(radicadoColumnIndex).getStringCellValue() : "";
+
+                            if (radicado.equals(radicadoFinal)) {
+                                // Construye la sentencia SQL
+                                StringBuilder sql = new StringBuilder("INSERT INTO your_table_name (ID");
+
+                                // Añade columnas
+                                for (Cell cell : headerRow) {
+                                    String header = cell.getStringCellValue().trim();
+                                    if (!header.equalsIgnoreCase("RADICADO")) {
+                                        sql.append(", ").append(header);
+                                    }
+                                }
+                                sql.append(") VALUES (");
+
+                                // Añade valores
+                                sql.append("'").append(radicadoFinal).append("'");
+
+                                for (int i = 1; i < headerRow.getLastCellNum(); i++) {
+                                    Cell cell = row.getCell(i);
+                                    String value = (cell != null) ? cell.toString() : "";
+                                    sql.append(", '").append(value).append("'");
+                                }
+
+                                sql.append(");\n");
+
+                                // Escribe el SQL al archivo
+                                bw.write(sql.toString());
+                                bw.flush(); // Asegura que los datos se escriban inmediatamente
+                            }
+                        }
+                    }
+
+                    System.out.println("Datos SQL generados y añadidos al archivo: " + sqlFile.getAbsolutePath());
+
+                    // Imprime el contenido del archivo SQL en la consola
+                    printSqlFileContent(sqlFile);
+
+                } else {
+                    System.out.println("No existe la columna \"RADICADO\" en el archivo");
+                }
+
+            } catch (IOException e) {
+                System.out.println("Error al leer o escribir en el archivo: " + e.getMessage());
+            }
+
+        } else {
+            System.out.println("No se puede registrar el número digitado, ya que debería tener 23 cifras");
+        }
+    }
+
+    private void printSqlFileContent(File sqlFile) {
+        try (BufferedReader br = new BufferedReader(new FileReader(sqlFile))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                System.out.println(line);
+            }
+        } catch (IOException e) {
+            System.out.println("Error al leer el archivo SQL: " + e.getMessage());
+        }
+    }
+}

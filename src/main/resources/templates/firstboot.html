@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>First Boot Setup</title>
+    <style>
+        #dropZone {
+            width: 100%;
+            padding: 50px;
+            border: 2px dashed #ccc;
+            text-align: center;
+            font-family: Arial, sans-serif;
+            color: #666;
+            margin-bottom: 20px;
+            cursor: pointer;
+        }
+        #dropZone.dragover {
+            background-color: #f0f0f0;
+            border-color: #aaa;
+        }
+        #fileInput {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Setup Inicial</h1>
+    
+    <!-- Zona de arrastrar y soltar -->
+    <div id="dropZone">Arrastra y suelta un archivo aquí o haz clic para seleccionar uno</div>
+    
+    <!-- Input de archivo oculto -->
+    <input type="file" id="fileInput" name="file" required>
+    
+    <form id="uploadForm" action="/firstboot/upload" method="post" enctype="multipart/form-data">
+        <button type="submit">Cargar</button>
+    </form>
+
+    <div th:if="${error != null}">
+        <p th:text="${error}"></p>
+    </div>
+
+    <script>
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const uploadForm = document.getElementById('uploadForm');
+
+        // Abrir el selector de archivos cuando se hace clic en la zona de arrastrar y soltar
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        // Manejar el evento de arrastrar y soltar
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                fileInput.files = files;
+            }
+        });
+
+        // Actualizar el texto de la zona con el nombre del archivo seleccionado
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files.length > 0) {
+                dropZone.textContent = `Archivo seleccionado: ${fileInput.files[0].name}`;
+            }
+        });
+    </script>
+</body>
+</html>
