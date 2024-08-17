@@ -4,7 +4,42 @@
     <title>User Home</title>
 </head>
 <body>
-    <h1>Bienvenido, Usuario</h1>
-    <!-- Contenido específico para el usuario -->
+    <h1>User Home</h1>
+    
+    <form action="/user/execute" method="post" th:action="@{/user/execute}">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+        
+        <div>
+            <label for="radNumber">Número de Radicado:</label>
+            <input type="text" id="radNumber" name="radNumber" required>
+        </div>
+        <button type="submit" name="action" value="action1">Ejecutar Acción 1</button>
+        <button type="submit" name="action" value="action2">Buscar en La rama</button>
+    </form>
+    
+    <div>
+        <h2>Resultado:</h2>
+        <p th:text="${result}"></p>
+    </div>
+
+    <div th:if="${process != null}">
+        <h2>Detalles del Proceso:</h2>
+        <p>Clave del Proceso: <span th:text="${process.process.key_procces}"></span></p>
+        <p>Fuente: <span th:text="${process.process.source}"></span></p>
+        <p>Fecha de Radicación: <span th:text="${process.process.radication_date}"></span></p>
+        <p>Oficina: <span th:text="${process.process.office}"></span></p>
+        <p>Ponente: <span th:text="${process.process.speaker}"></span></p>
+        <h3>Acciones:</h3>
+        <ul>
+            <li th:each="action : ${process.process.actions}">
+                Fecha de Acción: <span th:text="${action.action_date}"></span> - 
+                Acción: <span th:text="${action.action}"></span> - 
+                Anotación: <span th:text="${action.annotation}"></span> - 
+                Fecha Inicial: <span th:text="${action.start_date}"></span> - 
+                Fecha Final: <span th:text="${action.end_date}"></span> - 
+                Fecha de Registro: <span th:text="${action.registration_date}"></span>
+            </li>
+        </ul>
+    </div>
 </body>
 </html>
