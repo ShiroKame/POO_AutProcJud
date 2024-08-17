@@ -1,11 +1,15 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Spring Boot HTML Interface</title>
+    <title>Admin Home</title>
 </head>
 <body>
-    <h1>Spring Boot HTML Interface</h1>
-    <form action="/execute" method="post">
+    <h1>Admin Home</h1>
+    
+    <form action="/admin/execute" method="post" th:action="@{/admin/execute}">
+        <!-- CSRF Token -->
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+        
         <div>
             <label for="radNumber">Número de Radicado:</label>
             <input type="text" id="radNumber" name="radNumber" required>
@@ -13,10 +17,12 @@
         <button type="submit" name="action" value="action1">Ejecutar Acción 1</button>
         <button type="submit" name="action" value="action2">Buscar en La rama</button>
     </form>
+    
     <div>
         <h2>Resultado:</h2>
         <p th:text="${result}"></p>
     </div>
+
     <div th:if="${process != null}">
         <h2>Detalles del Proceso:</h2>
         <p>Clave del Proceso: <span th:text="${process.process.key_procces}"></span></p>
@@ -35,6 +41,10 @@
                 Fecha de Registro: <span th:text="${action.registration_date}"></span>
             </li>
         </ul>
+    </div>
+
+    <div>
+        <a href="/admin/accesspanel">Editar Usuarios</a>
     </div>
 </body>
 </html>
