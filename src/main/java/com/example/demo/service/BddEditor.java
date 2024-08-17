@@ -10,7 +10,6 @@ public class BddEditor {
     public void agregarRadicado(String number) {
         String radicadoFinal = number;
 
-
         if (radicadoFinal.length() == 23) {
             // Usa una ruta absoluta para el archivo Excel C:\Users\ESTUDIANTE\Downloads
             File excelFile = new File("C:/Users/ESTUDIANTE/Downloads/test.xlsx");
@@ -60,7 +59,5 @@ public class BddEditor {
         } else {
             System.out.println("No se puede registrar el número digitado, ya que debería tener 23 cifras");
         }
-
-
     }
 }
