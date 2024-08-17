@@ -79,12 +79,22 @@ public class AdminController {
     }
 
     @PostMapping("/create-user")
-    public String createUser(@RequestParam String username, @RequestParam String password, @RequestParam String role) {
+    public String createUser(@RequestParam String username, @RequestParam String password, @RequestParam String role, Model model) {
+        // Verificar si el nombre de usuario ya existe
+        Optional<User> existingUser = userRepository.findByUsername(username);
+        if (existingUser.isPresent()) {
+            // Si el nombre de usuario ya existe, mostrar un mensaje de error en la vista
+            System.err.println("ya existe ese");
+            model.addAttribute("error", "El nombre de usuario ya existe. Por favor, elija otro.");
+            return "redirect:/admin/accesspanel"; // Volver a la vista de edición de usuarios
+        }
+
+        // Crear un nuevo usuario
         User user = new User();
         user.setUsername(username);
-        user.setPassword(passwordEncoder.encode(password)); // Encode the password
+        user.setPassword(passwordEncoder.encode(password)); // Codificar la contraseña
 
-        // Find the role
+        // Buscar el rol
         Optional<Role> optionalRole = roleRepository.findByName(role);
         if (optionalRole.isEmpty()) {
             throw new RuntimeException("Rol no encontrado");
