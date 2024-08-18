@@ -1,164 +1,116 @@
 package com.example.demo.service;
 
 import org.apache.poi.ss.usermodel.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook; // Para archivos XLS
-import org.apache.poi.xssf.usermodel.XSSFWorkbook; // Para archivos XLSX
 
+import javax.annotation.PostConstruct;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 
-import java.io.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
+@Service
 public class BddEditor {
 
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    // Ruta de la base de datos persistente
+    private static final String DATABASE_PATH = "./src/main/BDD/your_database_name.mv.db";
+
+    // Este método se ejecuta cuando la aplicación arranca
+    @PostConstruct
+    public void init() {
+        // Verifica si el archivo de la base de datos existe
+        File databaseFile = new File(DATABASE_PATH);
+        if (databaseFile.exists()) {
+            // Si existe, la elimina
+            if (databaseFile.delete()) {
+                System.out.println("Base de datos existente eliminada.");
+            } else {
+                System.out.println("No se pudo eliminar la base de datos existente.");
+            }
+        }
+    }
+
+    @Transactional
     public void setupExcelBdd(MultipartFile file) throws IOException {
-        if (!file.getOriginalFilename().endsWith(".xlsx") && !file.getOriginalFilename().endsWith(".xls")) {
-            throw new IllegalArgumentException("El archivo debe ser un archivo Excel (.xlsx o .xls)");
+        Workbook workbook = WorkbookFactory.create(file.getInputStream());
+        Sheet sheet = workbook.getSheetAt(0);
+        Row headerRow = sheet.getRow(0);
+
+        List<String> columns = new ArrayList<>();
+        for (Cell cell : headerRow) {
+            String columnName = cell.getStringCellValue().trim();
+            if (columnName.isEmpty()) {
+                columnName = "Column_" + cell.getColumnIndex();
+            }
+            // Reemplazar caracteres no válidos y espacios
+            columnName = columnName.replaceAll("[^a-zA-Z0-9_]", "_");
+            if (columnName.matches("\\d.*")) {
+                columnName = "col_" + columnName;
+            }
+            columns.add(columnName);
         }
 
-        try (InputStream is = file.getInputStream();
-             Workbook workbook = file.getOriginalFilename().endsWith(".xlsx") ? new XSSFWorkbook(is) : new HSSFWorkbook(is)) {
+        // Crear la tabla si no existe
+        StringBuilder createTableSQL = new StringBuilder("CREATE TABLE IF NOT EXISTS your_table (");
+        for (String column : columns) {
+            createTableSQL.append(column).append(" VARCHAR(1000), "); // Tamaño configurado a 1000 caracteres
+        }
+        createTableSQL.setLength(createTableSQL.length() - 2);
+        createTableSQL.append(")");
 
-            Sheet sheet = workbook.getSheetAt(0);
-            Row headerRow = sheet.getRow(0);
-            int radicadoIndex = -1;
-            int columnCount = headerRow.getPhysicalNumberOfCells();
-            StringBuilder columnsBuilder = new StringBuilder();
-            StringBuilder valuesBuilder = new StringBuilder();
-            String[] columnsToExclude = {"Exp"};
+        jdbcTemplate.execute(createTableSQL.toString());
 
-            for (int i = 0; i < columnCount; i++) {
-                Cell cell = headerRow.getCell(i);
-                String columnName = cell.getStringCellValue().trim();
+        for (int i = 1; i <= sheet.getLastRowNum(); i++) {
+            Row row = sheet.getRow(i);
+            if (row != null) {
+                StringBuilder insertSQL = new StringBuilder("INSERT INTO your_table (");
+                insertSQL.append(String.join(", ", columns));
+                insertSQL.append(") VALUES (");
 
-                boolean exclude = false;
-                for (String excludeColumn : columnsToExclude) {
-                    if (excludeColumn.equalsIgnoreCase(columnName)) {
-                        exclude = true;
-                        break;
+                List<Object> values = new ArrayList<>();
+                for (int j = 0; j < columns.size(); j++) {
+                    Cell cell = row.getCell(j);
+                    if (cell != null) {
+                        values.add(cell.toString());
+                    } else {
+                        values.add(null); // Agregamos null para mantener la sincronización
                     }
+                    insertSQL.append("?, "); // Agregamos "?" para cada columna, incluyendo null
                 }
+                insertSQL.setLength(insertSQL.length() - 2); // Removemos la última coma y espacio
+                insertSQL.append(")");
 
-                if (exclude) {
-                    continue;
-                }
-
-                if ("RADICADO".equalsIgnoreCase(columnName)) {
-                    radicadoIndex = i;
-                }
-
-                if (i > 0 && !exclude) {
-                    columnsBuilder.append(", ");
-                    valuesBuilder.append(", ");
-                }
-                if (!exclude) {
-                    columnsBuilder.append(columnName);
-                    valuesBuilder.append("?");
-                }
+                jdbcTemplate.update(insertSQL.toString(), values.toArray()); // Ejecutamos la consulta
             }
-
-            if (radicadoIndex == -1) {
-                System.out.println("Columna 'RADICADO' no encontrada.");
-                return;
-            }
-
-            StringBuilder sqlBuilder = new StringBuilder();
-            sqlBuilder.append("ALTER TABLE your_table ADD COLUMN RADICADO VARCHAR(255);\n");
-
-            for (int i = 1; i <= sheet.getLastRowNum(); i++) {
-                Row row = sheet.getRow(i);
-                if (row != null) {
-                    Cell radicadoCell = row.getCell(radicadoIndex);
-                    if (radicadoCell == null || radicadoCell.toString().trim().isEmpty()) {
-                        continue;
-                    }
-
-                    StringBuilder values = new StringBuilder();
-                    values.append("(");
-                    for (int j = 0; j < columnCount; j++) {
-                        Cell cell = row.getCell(j);
-                        String columnName = headerRow.getCell(j).getStringCellValue().trim();
-
-                        boolean exclude = false;
-                        for (String excludeColumn : columnsToExclude) {
-                            if (excludeColumn.equalsIgnoreCase(columnName)) {
-                                exclude = true;
-                                break;
-                            }
-                        }
-
-                        if (exclude) {
-                            continue;
-                        }
-
-                        if (j > 0) {
-                            values.append(", ");
-                        }
-                        if (cell != null) {
-                            String cellValue = cell.toString().replace("'", "''");
-                            values.append("'").append(cellValue).append("'");
-                        } else {
-                            values.append("NULL");
-                        }
-                    }
-                    values.append(")");
-
-                    sqlBuilder.append("INSERT INTO your_table (").append(columnsBuilder.toString()).append(") VALUES ").append(values.toString()).append(";\n");
-                }
-            }
-
-            File sqlFile = new File("E:/Desktop/OLLAMA/insert_data.sql");
-            try (FileWriter writer = new FileWriter(sqlFile)) {
-                writer.write(sqlBuilder.toString());
-            }
-
-            System.out.println("Datos exportados a SQL con éxito.");
-
         }
     }
 
-    @SuppressWarnings("null")
+    @Transactional
     public void setupSqlBdd(MultipartFile file) throws IOException {
-        if (!file.getOriginalFilename().endsWith(".sql")) {
-            throw new IllegalArgumentException("El archivo debe ser un archivo SQL (.sql)");
-        }
-
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()));
-             FileWriter writer = new FileWriter("E:/Desktop/OLLAMA/processed_data.sql")) {
-
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
+            StringBuilder sql = new StringBuilder();
             String line;
-            StringBuilder sqlBuilder = new StringBuilder();
-            Pattern insertPattern = Pattern.compile("INSERT INTO\\s+your_table\\s*\\(([^)]+)\\)\\s*VALUES\\s*\\(([^)]+)\\);");
-
             while ((line = reader.readLine()) != null) {
-                Matcher matcher = insertPattern.matcher(line);
-                if (matcher.find()) {
-                    String columns = matcher.group(1);
-                    String values = matcher.group(2);
-                    String[] columnArray = columns.split(",\\s*");
-                    String[] valueArray = values.split(",\\s*");
-
-                    StringBuilder formattedValues = new StringBuilder();
-                    formattedValues.append("(");
-                    for (int i = 0; i < columnArray.length; i++) {
-                        if (i > 0) {
-                            formattedValues.append(", ");
-                        }
-                        String value = valueArray[i].replace("'", "''"); // Escapar comillas simples
-                        formattedValues.append("'").append(value).append("'");
-                    }
-                    formattedValues.append(")");
-
-                    sqlBuilder.append("INSERT INTO your_table (").append(columns).append(") VALUES ").append(formattedValues).append(";\n");
+                sql.append(line);
+                if (line.endsWith(";")) {
+                    jdbcTemplate.execute(sql.toString());
+                    sql.setLength(0);
                 }
             }
-
-            writer.write(sqlBuilder.toString());
-            System.out.println("Archivo SQL procesado con éxito.");
         }
     }
-    public void agregarRadicado(String number){
-        System.out.println("accion1 con rad "+number);
+
+    @Transactional
+    public void agregarRadicado(String number) {
+        jdbcTemplate.update("INSERT INTO your_table (RADICADO) VALUES (?)", number);
     }
 }

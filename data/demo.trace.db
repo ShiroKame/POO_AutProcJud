@@ -1,0 +1,12 @@
+2024-08-18 16:49:04.221504-05:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLDataException: Valor demasiado largo para la columna "COLUMN_7 CHARACTER VARYING(255)": "'notificacionesjudiciales@cafesalud.com.co <notificacionesjudiciales@cafesalud.c... (304)"
+Value too long for column "COLUMN_7 CHARACTER VARYING(255)": "'notificacionesjudiciales@cafesalud.com.co <notificacionesjudiciales@cafesalud.c... (304)"; SQL statement:
+INSERT INTO your_table (Exp_, RADICADO, Cliente, Juzgado, MICROSITIO, Column_5, BARANDA, Column_7, ultima_revision, Column_9, Column_10) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [22001-224]
+2024-08-18 16:51:39.817380-05:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLDataException: Valor demasiado largo para la columna "COLUMN_7 CHARACTER VARYING(255)": "'notificacionesjudiciales@cafesalud.com.co <notificacionesjudiciales@cafesalud.c... (304)"
+Value too long for column "COLUMN_7 CHARACTER VARYING(255)": "'notificacionesjudiciales@cafesalud.com.co <notificacionesjudiciales@cafesalud.c... (304)"; SQL statement:
+INSERT INTO your_table (Exp_, RADICADO, Cliente, Juzgado, MICROSITIO, Column_5, BARANDA, Column_7, ultima_revision, Column_9, Column_10) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [22001-224]
+2024-08-18 16:53:11.826767-05:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLDataException: Valor demasiado largo para la columna "COLUMN_7 CHARACTER VARYING(255)": "'notificacionesjudiciales@cafesalud.com.co <notificacionesjudiciales@cafesalud.c... (304)"
+Value too long for column "COLUMN_7 CHARACTER VARYING(255)": "'notificacionesjudiciales@cafesalud.com.co <notificacionesjudiciales@cafesalud.c... (304)"; SQL statement:
+INSERT INTO your_table (Exp_, RADICADO, Cliente, Juzgado, MICROSITIO, Column_5, BARANDA, Column_7, ultima_revision, Column_9, Column_10) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) [22001-224]

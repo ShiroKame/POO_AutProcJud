@@ -1,4 +1,4 @@
- package com.example.demo.config;
+package com.example.demo.config;
 
 import com.example.demo.model.Role;
 import com.example.demo.model.User;
@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -37,6 +38,8 @@ public class SecurityConfig {
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 .requestMatchers("/user/**").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/firstboot/**").hasRole("ADMIN")
+                .requestMatchers("/h2-console/**").hasRole("ADMIN") // Permite el acceso a la consola H2
+                .requestMatchers("/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
@@ -45,11 +48,19 @@ public class SecurityConfig {
                 .permitAll()
             )
             .rememberMe(rememberMe -> rememberMe
-                .key("uniqueAndSecretKey") // You can customize this key
-                .tokenValiditySeconds(86400) // Token duration in seconds (1 day in this example)
+                .key("uniqueAndSecretKey") // Puedes personalizar esta clave
+                .tokenValiditySeconds(86400) // Duración del token en segundos (1 día en este ejemplo)
                 .userDetailsService(userDetailsService)
             )
-            .logout(logout -> logout.permitAll());
+            .logout(logout -> logout.permitAll())
+            .csrf(csrf -> csrf
+                .ignoringRequestMatchers("/h2-console/**") // Desactiva CSRF para la consola H2
+            )
+            .headers(headers -> headers
+                .httpStrictTransportSecurity(hsts -> hsts.disable()) // Desactiva HSTS si es necesario
+                .contentSecurityPolicy(csp -> csp.policyDirectives("default-src 'self'; frame-ancestors 'self'")) // Ajusta la política de seguridad de contenido
+                .frameOptions().sameOrigin() // Permite frames solo desde el mismo origen
+            );
 
         return http.build();
     }

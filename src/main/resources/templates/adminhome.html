@@ -2,8 +2,8 @@
 <html xmlns:th="http://www.thymeleaf.org">
   <head>
     <!-- <link rel="stylesheet" href="bootstrap/css/bootstrap.css" /> -->
-    <link rel="stylesheet" href="/public/bootstrap/css/bootstrap.css" />
-    <link rel="stylesheet" href="/public/css/adminhome.css" />
+    <link rel="stylesheet" href="/bootstrap/css/bootstrap.css" />
+    <link rel="stylesheet" href="/css/adminhome.css" />
     <title>Admin Home</title>
   </head>
   <body>
@@ -21,7 +21,7 @@
           href="/admin/accesspanel"
           class="btn btn-warning w-25 shadow mt-4 d-flex justify-content-around"
         >
-          <img src="/public/icons/gear-icon.svg" alt="" style="width: 1.5rem" />
+          <img src="/icons/gear-icon.svg" alt="" style="width: 1.5rem" />
           Configuración
         </a>
       </div>
@@ -53,6 +53,14 @@
           />
         </div>
         <div class="btn-group w-100 shadow" role="group" aria-label="Actions">
+          <button
+            type="submit"
+            name="action"
+            value="action3"
+            class="btn btn-primary form-actions"
+          >
+            Ver Base de Datos
+          </button>
           <button
             type="submit"
             name="action"
@@ -128,7 +136,7 @@
         </div>
       </div>
     </div>
-    <script src="/public/bootstrap/js/bootstrap.js"></script>
+    <script src="/bootstrap/js/bootstrap.js"></script>
     <script>
       if (/\/execute$/g.test(this.location.pathname)) {
         document.querySelector('.resultado').classList.add('show')

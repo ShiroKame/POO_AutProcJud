@@ -12,6 +12,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -31,7 +37,7 @@ public class AdminController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
-    
+
     @GetMapping
     public String adminHome(Model model) {
         // Display the adminHome view for administrators
@@ -43,34 +49,34 @@ public class AdminController {
     public String executeAction(@RequestParam(name = "action", required = false) String action,
                                 @RequestParam(name = "radNumber", required = false) String radNumber,
                                 Model model) {
-        String result;
+    String result;
 
-        if ("action1".equals(action)) {
-            try {
-                bddEditor.agregarRadicado(radNumber);
-                result = "Acción 1 ejecutada con éxito!";
-            } catch (Exception e) {
-                result = "Error al ejecutar Acción 1: " + e.getMessage();
-            }
-        } else if ("action2".equals(action)) {
-            try {
-                if (radNumber != null && !radNumber.isEmpty()) {
-                    Map<String, Object> process = webScrapper.queryProcess(radNumber);
-                    model.addAttribute("process", process);
-                    result = "Acción 2 ejecutada con éxito!";
-                } else {
-                    result = "Número de radicado no proporcionado!";
-                }
-            } catch (Exception e) {
-                result = "Error al ejecutar Acción 2: " + e.getMessage();
-            }
-        } else {
-            result = "Acción desconocida!";
+    if ("action1".equals(action)) {
+        try {
+            bddEditor.agregarRadicado(radNumber);
+            result = "Acción 1 ejecutada con éxito!";
+        } catch (Exception e) {
+            result = "Error al ejecutar Acción 1: " + e.getMessage();
         }
-
-        model.addAttribute("result", result);
-        return "adminhome"; // Return to adminHome view
+    } else if ("action2".equals(action)) {
+        try {
+            if (radNumber != null && !radNumber.isEmpty()) {
+                Map<String, Object> process = webScrapper.queryProcess(radNumber);
+                model.addAttribute("process", process);
+                result = "Acción 2 ejecutada con éxito!";
+            } else {
+                result = "Número de radicado no proporcionado!";
+            }
+        } catch (Exception e) {
+            result = "Error al ejecutar Acción 2: " + e.getMessage();
+        }
+    } else {
+        result = "Acción desconocida!";
     }
+
+    model.addAttribute("result", result);
+    return "adminhome"; // Return to adminHome view
+}
 
     @GetMapping("/accesspanel")
     public String accessPanel(Model model) {
@@ -84,7 +90,6 @@ public class AdminController {
         Optional<User> existingUser = userRepository.findByUsername(username);
         if (existingUser.isPresent()) {
             // Si el nombre de usuario ya existe, mostrar un mensaje de error en la vista
-            System.err.println("ya existe ese");
             model.addAttribute("error", "El nombre de usuario ya existe. Por favor, elija otro.");
             return "redirect:/admin/accesspanel"; // Volver a la vista de edición de usuarios
         }
