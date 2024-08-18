@@ -1,7 +1,6 @@
 package com.example.demo.service;
 
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.web.multipart.MultipartFile;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook; // Para archivos XLS
 import org.apache.poi.xssf.usermodel.XSSFWorkbook; // Para archivos XLSX
@@ -119,6 +118,7 @@ public class BddEditor {
         }
     }
 
+    @SuppressWarnings("null")
     public void setupSqlBdd(MultipartFile file) throws IOException {
         if (!file.getOriginalFilename().endsWith(".sql")) {
             throw new IllegalArgumentException("El archivo debe ser un archivo SQL (.sql)");

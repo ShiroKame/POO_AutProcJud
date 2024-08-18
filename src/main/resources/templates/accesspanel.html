@@ -4,38 +4,17 @@
     <link rel="stylesheet" href="/bootstrap/css/bootstrap.css">
     <link rel="stylesheet" href="/css/firstboot.css">
     <link rel="stylesheet" href="/css/accesspanel.css">
-    <title>Setup Inicial y Panel de Acceso</title>
+    <title>Panel de Acceso</title>
 </head>
 <body>
     <!-- Encabezado -->
     <header class="navbar bg-dark d-flex justify-content-center shadow">
-        <h1 class="text-white">Setup Inicial y Panel de Acceso</h1>
+        <h1 class="text-white">Panel de Acceso</h1>
     </header>
 
     <div class="container mb-4">
-        <!-- Formulario de carga de archivo -->
-        <div class="mt-4">
-            <h2>Setup Inicial</h2>
-            <form id="uploadForm" action="/firstboot/upload" method="post" enctype="multipart/form-data" th:action="@{/firstboot/upload}">
-                <!-- CSRF Token -->
-                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-
-                <!-- Zona de arrastrar y soltar -->
-                <div id="dropZone" class="mt-4 bg-light rounded p-4 text-center">Arrastra y suelta un archivo aquí o haz clic para seleccionar uno</div>
-                
-                <!-- Input de archivo oculto -->
-                <input type="file" id="fileInput" name="file" class="d-none" required>
-
-                <button type="submit" class="btn btn-primary w-100 shadow mt-3">Cargar</button>
-            </form>
-        
-            <div th:if="${error != null}" class="mt-3 alert alert-danger">
-                <p th:text="${error}"></p>
-            </div>
-        </div>
-
-        <!-- Panel de Acceso -->
-        <h2 class="mt-5">Panel de Acceso</h2>
+                <!-- Panel de Acceso -->
+        <h2 class="mt-5">Crear Nuevo Usuario</h2>
         <!-- Formulario usuarios -->
         <form action="/admin/create-user" method="post" th:action="@{/admin/create-user}">
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/> <!-- CSRF Token -->
