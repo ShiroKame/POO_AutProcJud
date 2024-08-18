@@ -25,13 +25,17 @@
 <body>
     <h1>Setup Inicial</h1>
     
-    <!-- Zona de arrastrar y soltar -->
-    <div id="dropZone">Arrastra y suelta un archivo aquí o haz clic para seleccionar uno</div>
-    
-    <!-- Input de archivo oculto -->
-    <input type="file" id="fileInput" name="file" required>
-    
-    <form id="uploadForm" action="/firstboot/upload" method="post" enctype="multipart/form-data">
+    <!-- Formulario de carga de archivo -->
+    <form id="uploadForm" action="/firstboot/upload" method="post" enctype="multipart/form-data" th:action="@{/firstboot/upload}">
+        <!-- CSRF Token -->
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+        <!-- Zona de arrastrar y soltar -->
+        <div id="dropZone">Arrastra y suelta un archivo aquí o haz clic para seleccionar uno</div>
+        
+        <!-- Input de archivo oculto -->
+        <input type="file" id="fileInput" name="file" required>
+
         <button type="submit">Cargar</button>
     </form>
 
@@ -61,10 +65,13 @@
             const files = e.dataTransfer.files;
             if (files.length > 0) {
                 fileInput.files = files;
+
+                // Actualizar el texto de la zona con el nombre del archivo seleccionado
+                dropZone.textContent = `Archivo seleccionado: ${fileInput.files[0].name}`;
             }
         });
 
-        // Actualizar el texto de la zona con el nombre del archivo seleccionado
+        // Actualizar el texto de la zona con el nombre del archivo seleccionado si se elige manualmente
         fileInput.addEventListener('change', () => {
             if (fileInput.files.length > 0) {
                 dropZone.textContent = `Archivo seleccionado: ${fileInput.files[0].name}`;

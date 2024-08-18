@@ -18,11 +18,11 @@ public class HomeController {
 
     @GetMapping("/")
     public String home(Model model) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String role = authentication.getAuthorities().iterator().next().getAuthority();
         if (!firstBootStatus.isFirstBootCompleted()) {
             return "redirect:/firstboot"; // Redirige al proceso de firstboot si no se ha completado
         }else{
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            String role = authentication.getAuthorities().iterator().next().getAuthority();
             if (role.equals("ROLE_ADMIN")) {
                 return "redirect:/admin"; // Redirige al home del admin
             } else if (role.equals("ROLE_USER")) {

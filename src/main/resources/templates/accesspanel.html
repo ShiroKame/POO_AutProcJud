@@ -8,6 +8,7 @@
 
     <h2>Crear Usuario</h2>
     <form action="/admin/create-user" method="post" th:action="@{/admin/create-user}">
+    <!--form th:action="@{/admin/create-user}" method="post"-->
         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/> <!-- CSRF Token -->
         <label for="username">Nombre de Usuario:</label>
         <input type="text" id="username" name="username" required>

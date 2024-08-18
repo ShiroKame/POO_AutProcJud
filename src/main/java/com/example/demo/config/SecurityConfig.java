@@ -35,7 +35,7 @@ public class SecurityConfig {
                 .requestMatchers("/login").permitAll()
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 .requestMatchers("/user/**").hasAnyRole("USER", "ADMIN")
-                .requestMatchers("/firstboot").permitAll()
+                .requestMatchers("/firstboot/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
@@ -58,7 +58,7 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    /*@Bean
+    @Bean
     public CommandLineRunner dataInitializer(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
         return args -> {
             long userCount = userRepository.count();
@@ -94,5 +94,5 @@ public class SecurityConfig {
                 }
             }
         };
-    }*/
+    }
 }
