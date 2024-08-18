@@ -1,46 +1,33 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <link rel="stylesheet" href="/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="/css/firstboot.css">
     <title>First Boot Setup</title>
-    <style>
-        #dropZone {
-            width: 100%;
-            padding: 50px;
-            border: 2px dashed #ccc;
-            text-align: center;
-            font-family: Arial, sans-serif;
-            color: #666;
-            margin-bottom: 20px;
-            cursor: pointer;
-        }
-        #dropZone.dragover {
-            background-color: #f0f0f0;
-            border-color: #aaa;
-        }
-        #fileInput {
-            display: none;
-        }
-    </style>
 </head>
 <body>
-    <h1>Setup Inicial</h1>
+    <header class="navbar bg-dark d-flex justify-content-center shadow">
+        <h1 class="text-white">Setup Inicial</h1>
+    </header>
     
-    <!-- Formulario de carga de archivo -->
-    <form id="uploadForm" action="/firstboot/upload" method="post" enctype="multipart/form-data" th:action="@{/firstboot/upload}">
-        <!-- CSRF Token -->
-        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+    <div class="container">
+        <!-- Formulario de carga de archivo -->
+        <form id="uploadForm" action="/firstboot/upload" method="post" enctype="multipart/form-data" th:action="@{/firstboot/upload}">
+            <!-- CSRF Token -->
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
 
-        <!-- Zona de arrastrar y soltar -->
-        <div id="dropZone">Arrastra y suelta un archivo aquí o haz clic para seleccionar uno</div>
-        
-        <!-- Input de archivo oculto -->
-        <input type="file" id="fileInput" name="file" required>
+            <!-- Zona de arrastrar y soltar -->
+            <div id="dropZone" class="mt-4 bg-light rounded p-4 text-center">Arrastra y suelta un archivo aquí o haz clic para seleccionar uno</div>
+            
+            <!-- Input de archivo oculto -->
+            <input type="file" id="fileInput" name="file" class="d-none" required>
 
-        <button type="submit">Cargar</button>
-    </form>
-
-    <div th:if="${error != null}">
-        <p th:text="${error}"></p>
+            <button type="submit" class="btn btn-primary w-100 shadow mt-3">Cargar</button>
+        </form>
+    
+        <div th:if="${error != null}" class="mt-3 alert alert-danger">
+            <p th:text="${error}"></p>
+        </div>
     </div>
 
     <script>
@@ -78,5 +65,6 @@
             }
         });
     </script>
+    <script src="/bootstrap/js/bootstrap.js"></script>
 </body>
 </html>

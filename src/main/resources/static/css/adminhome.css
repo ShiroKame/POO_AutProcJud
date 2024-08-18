@@ -1,0 +1,19 @@
+body{
+    /* background-image: url(/images/14547779_rm222-mind-14.svg); */
+    background: url("../images/14547779_rm222-mind-14.svg");
+    background-size: cover;
+    background-repeat: repeat;
+}
+
+.container .resultado{
+    display: none;
+}
+
+.container .show{
+    display: block;
+}
+
+.container .table-container{
+    max-height: 750px;
+    overflow: auto;
+}

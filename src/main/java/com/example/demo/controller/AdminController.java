@@ -31,7 +31,7 @@ public class AdminController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
-
+    
     @GetMapping
     public String adminHome(Model model) {
         // Display the adminHome view for administrators
@@ -69,7 +69,7 @@ public class AdminController {
         }
 
         model.addAttribute("result", result);
-        return "adminHome"; // Return to adminHome view
+        return "adminhome"; // Return to adminHome view
     }
 
     @GetMapping("/accesspanel")

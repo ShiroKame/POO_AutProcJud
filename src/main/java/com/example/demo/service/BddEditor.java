@@ -159,6 +159,6 @@ public class BddEditor {
         }
     }
     public void agregarRadicado(String number){
-        System.out.println("accion1 con rad "+number);;
+        System.out.println("accion1 con rad "+number);
     }
 }
