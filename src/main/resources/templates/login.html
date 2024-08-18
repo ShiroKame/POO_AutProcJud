@@ -1,26 +1,57 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
+  <head>
+    <link rel="stylesheet" href="/bootstrap/css/bootstrap.css" />
+    <link rel="stylesheet" href="/css/login.css" />
     <title>Login</title>
-</head>
-<body>
-    <h2>Login</h2>
-    <form th:action="@{/login}" method="post">
-        <div>
-            <label>Username:</label>
-            <input type="text" name="username" required/>
-        </div>
-        <div>
-            <label>Password:</label>
-            <input type="password" name="password" required/>
-        </div>
-        <div>
-            <input type="checkbox" name="remember-me" id="remember-me">
-            <label for="remember-me">Remember Me</label>
-        </div>
-        <div>
-            <button type="submit">Login</button>
-        </div>
-    </form>
-</body>
+  </head>
+  <body>
+    <div class="container vh-100 d-flex align-items-center">
+      <div class="bg-white rounded m-auto shadow p-4 login-container">
+        <!-- Encabezado -->
+        <header class="navbar d-flex justify-content-center">
+          <h2>Login</h2>
+        </header>
+
+        <!-- Fomulario -->
+        <form th:action="@{/login}" method="post">
+          <div class="mb-3">
+            <label for="Username" class="form-label">Username</label>
+            <input
+              type="text"
+              name="username"
+              class="form-control"
+              id="Username"
+              required
+            />
+          </div>
+          <div class="mb-3">
+            <label for="Password" class="form-label">Password</label>
+            <input
+              type="password"
+              name="password"
+              class="form-control"
+              id="Password"
+              required
+            />
+          </div>
+          <div class="mb-3 form-check">
+            <input
+              type="checkbox"
+              name="remember-me"
+              class="form-check-input"
+              id="exampleCheck1"
+            />
+            <label class="form-check-label" for="exampleCheck1"
+              >Remember me</label
+            >
+          </div>
+          <div class="d-flex justify-content-center">
+            <button type="submit" class="btn btn-primary w-75">Login</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <script src="/bootstrap/js/bootstrap.js"></script>
+  </body>
 </html>
