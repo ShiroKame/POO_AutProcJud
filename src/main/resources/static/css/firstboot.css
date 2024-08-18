@@ -1,0 +1,23 @@
+body{
+    background: url("../images/14547779_rm222-mind-14.svg");
+    background-size: cover;
+    background-repeat: repeat;
+}
+
+#dropZone {
+    width: 100%;
+    padding: 50px;
+    border: 2px dashed #ccc;
+    text-align: center;
+    font-family: Arial, sans-serif;
+    color: #666;
+    margin-bottom: 20px;
+    cursor: pointer;
+}
+#dropZone.dragover {
+    background-color: #f0f0f0;
+    border-color: #aaa;
+}
+#fileInput {
+    display: none;
+}
