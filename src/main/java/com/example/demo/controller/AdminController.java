@@ -12,11 +12,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -138,25 +133,25 @@ public class AdminController {
     }
     //SELECT * FROM YOUR_TABLE 
     @GetMapping("/adminbdd")
-public String viewDatabase(Model model) {
-    String tableName = "YOUR_TABLE";
-    List<String> columns = bddEditor.getTableColumns(tableName);
-    List<Map<String, Object>> rows = bddEditor.getTableData(tableName);
+    public String viewDatabase(Model model) {
+        String tableName = "YOUR_TABLE";
+        List<String> columns = bddEditor.getTableColumns(tableName);
+        List<Map<String, Object>> rows = bddEditor.getTableData(tableName);
 
-    // Normaliza las claves y los valores, si es necesario
-    List<Map<String, Object>> normalizedRows = rows.stream()
-        .map(row -> row.entrySet().stream()
-            .collect(Collectors.toMap(
-                Map.Entry::getKey,
-                entry -> entry.getValue() != null ? entry.getValue() : " "
-            ))
-        )
-        .collect(Collectors.toList());
+        // Normaliza las claves y los valores, si es necesario
+        List<Map<String, Object>> normalizedRows = rows.stream()
+            .map(row -> row.entrySet().stream()
+                .collect(Collectors.toMap(
+                    Map.Entry::getKey,
+                    entry -> entry.getValue() != null ? entry.getValue() : " "
+                ))
+            )
+            .collect(Collectors.toList());
 
-    model.addAttribute("columns", columns);
-    model.addAttribute("rows", normalizedRows); // Mantén la lista completa aquí
+        model.addAttribute("columns", columns);
+        model.addAttribute("rows", normalizedRows);
 
-    return "adminbdd"; // Nombre del archivo HTML sin la extensión .html
-}
+        return "adminbdd";
+    }
 
 }

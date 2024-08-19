@@ -23,24 +23,6 @@ public class BddEditor {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    // Ruta de la base de datos persistente
-    private static final String DATABASE_PATH = "./src/main/BDD/your_database_name.mv.db";
-
-    // Este método se ejecuta cuando la aplicación arranca
-    @PostConstruct
-    public void init() {
-        // Verifica si el archivo de la base de datos existe
-        File databaseFile = new File(DATABASE_PATH);
-        if (databaseFile.exists()) {
-            // Si existe, la elimina
-            if (databaseFile.delete()) {
-                System.out.println("Base de datos existente eliminada.");
-            } else {
-                System.out.println("No se pudo eliminar la base de datos existente.");
-            }
-        }
-    }
-
     @Transactional
     public void setupExcelBdd(MultipartFile file) throws IOException {
         Workbook workbook = WorkbookFactory.create(file.getInputStream());

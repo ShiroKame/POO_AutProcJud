@@ -10,12 +10,17 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
 
 @Controller
 @RequestMapping("/user")
 public class UserController {
-    private final BddEditor bddEditor = new BddEditor();
-    private final WebScrapper webScrapper = new WebScrapper();
+    @Autowired
+    private BddEditor bddEditor;
+
+    @Autowired
+    private WebScrapper webScrapper;
 
     @Autowired
     private UserRepository userRepository;
@@ -61,14 +66,23 @@ public class UserController {
     }
     @GetMapping("/bdd")
     public String viewDatabase(Model model) {
-        // Obtén los nombres de las tablas y los datos
-        String tableName = "YOUR_TABLE"; // Reemplaza esto con el nombre real de la tabla que deseas visualizar
+        String tableName = "YOUR_TABLE";
         List<String> columns = bddEditor.getTableColumns(tableName);
         List<Map<String, Object>> rows = bddEditor.getTableData(tableName);
 
-        model.addAttribute("columns", columns);
-        model.addAttribute("rows", rows);
+        // Normaliza las claves y los valores, si es necesario
+        List<Map<String, Object>> normalizedRows = rows.stream()
+            .map(row -> row.entrySet().stream()
+                .collect(Collectors.toMap(
+                    Map.Entry::getKey,
+                    entry -> entry.getValue() != null ? entry.getValue() : " "
+                ))
+            )
+            .collect(Collectors.toList());
 
-        return "bdd"; // Devuelve la vista bdd.html
+        model.addAttribute("columns", columns);
+        model.addAttribute("rows", normalizedRows); 
+
+        return "bdd";
     }
 }

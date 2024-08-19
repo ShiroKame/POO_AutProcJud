@@ -32,7 +32,8 @@
         <tbody>
             <!-- Renderiza las filas de datos -->
             <tr th:each="row : ${rows}">
-                <td th:each="column : ${columns}" th:text="${row[column]}"></td>
+                <!-- Por cada columna, renderiza el valor correspondiente en la fila -->
+                <td th:each="column : ${columns}" th:text="${row.get(column)}">No Data</td>
             </tr>
         </tbody>
     </table>
