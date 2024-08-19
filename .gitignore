@@ -31,3 +31,5 @@ build/
 
 ### VS Code ###
 .vscode/
+src/main/resources/BDD/temporalDataBase.mv.db
+src/main/resources/BDD/temporalDataBase.trace.db

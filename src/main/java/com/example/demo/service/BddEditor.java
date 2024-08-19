@@ -6,9 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.annotation.PostConstruct;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -95,9 +93,24 @@ public class BddEditor {
 
     @Transactional
     public void agregarRadicado(String number) {
+
         jdbcTemplate.update("INSERT INTO YOUR_TABLE (RADICADO) VALUES (?)", number);
     }
 
+    public void solicitudAgregarRadicado(String number) throws Exception{
+        if (number != null && number.length() == 23) {
+            String sql = "SELECT COUNT(*) FROM YOUR_TABLE WHERE TRIM(RADICADO) = ?";
+            Integer count = jdbcTemplate.queryForObject(sql, Integer.class, number);
+
+            if (count != null && count > 0) {
+                throw new Exception("El radicado '" + number + "' ya existe en la base de datos.");
+            } else {
+                System.out.println("El radicado no existe y puede ser agregado.");
+        }
+        }else{
+            throw new Exception("radicado incorrecto, debe tener 23 digitos");
+        }
+    }
     public List<String> getTableColumns(String tableName) {
         String sql = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = ?";
         return jdbcTemplate.queryForList(sql, String.class, tableName);

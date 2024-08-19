@@ -40,7 +40,7 @@ public class UserController {
 
         if ("action1".equals(action)) {
             try {
-                bddEditor.agregarRadicado(radNumber);
+                bddEditor.solicitudAgregarRadicado(radNumber);
                 result = "Acción 1 ejecutada con éxito!";
             } catch (Exception e) {
                 result = "Error al ejecutar Acción 1: " + e.getMessage();
