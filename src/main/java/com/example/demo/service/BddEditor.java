@@ -1,9 +1,5 @@
 package com.example.demo.service;
 
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -18,7 +14,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
+import java.util.stream.Collectors;
 
 import org.apache.poi.ss.usermodel.*;
 @Service
@@ -128,6 +124,29 @@ public class BddEditor {
     // Método para obtener los datos de la tabla
     public List<Map<String, Object>> getTableData(String tableName) {
         String sql = "SELECT * FROM " + tableName;
-        return jdbcTemplate.queryForList(sql);
-    }
+        List<Map<String, Object>> result = jdbcTemplate.queryForList(sql);
+    
+        // Reemplaza los valores null con un espacio en blanco
+        List<Map<String, Object>> normalizedResult = result.stream()
+            .map(row -> row.entrySet().stream()
+                .collect(Collectors.toMap(
+                    Map.Entry::getKey,
+                    entry -> entry.getValue() != null ? entry.getValue() : " "
+                ))
+            )
+            .collect(Collectors.toList());
+    
+        // Filtra las filas basándote en todas las columnas excepto EXP_
+        return normalizedResult.stream()
+            .filter(row -> {
+                // Verifica si todas las columnas excepto EXP_ tienen solo espacios en blanco
+                boolean allOtherColumnsEmpty = row.entrySet().stream()
+                    .filter(entry -> !entry.getKey().equals("EXP_"))
+                    .allMatch(entry -> entry.getValue().toString().trim().isEmpty());
+                
+                // Mantén la fila si no todas las demás columnas están vacías
+                return !allOtherColumnsEmpty;
+            })
+            .collect(Collectors.toList());
+    }     
 }

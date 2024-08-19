@@ -12,6 +12,24 @@
     </header>
 
     <div class="container">
+      <!-- Formulario para ver la base de datos -->
+      <form
+        class="mt-2 mb-4"
+        action="/admin/bdd"
+        method="get"
+        th:action="@{/admin/bdd}"
+      >
+        <div class="btn-group w-100 shadow" role="group" aria-label="Actions">
+          <button
+            type="submit"
+            name="action"
+            value="view-database"
+            class="btn btn-primary form-actions"
+          >
+            Ver Base de Datos
+          </button>
+        </div>
+      </form>
       <form
         class="mt-2 mb-4"
         action="/user/execute"

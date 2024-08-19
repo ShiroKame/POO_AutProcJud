@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -57,5 +58,17 @@ public class UserController {
 
         model.addAttribute("result", result);
         return "userHome"; // Return to userHome view
+    }
+    @GetMapping("/bdd")
+    public String viewDatabase(Model model) {
+        // Obtén los nombres de las tablas y los datos
+        String tableName = "YOUR_TABLE"; // Reemplaza esto con el nombre real de la tabla que deseas visualizar
+        List<String> columns = bddEditor.getTableColumns(tableName);
+        List<Map<String, Object>> rows = bddEditor.getTableData(tableName);
+
+        model.addAttribute("columns", columns);
+        model.addAttribute("rows", rows);
+
+        return "bdd"; // Devuelve la vista bdd.html
     }
 }

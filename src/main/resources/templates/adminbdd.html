@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Database Viewer</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <h1>Datos de la Tabla</h1>
+    <table>
+        <thead>
+            <tr>
+                <!-- Renderiza los encabezados de la tabla -->
+                <th th:each="column : ${columns}" th:text="${column}"></th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Renderiza las filas de datos -->
+            <tr th:each="row : ${rows}">
+                <!-- Por cada columna, renderiza el valor correspondiente en la fila -->
+                <td th:each="column : ${columns}" th:text="${row.get(column)}">No Data</td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>

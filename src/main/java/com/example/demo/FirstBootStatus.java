@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class FirstBootStatus {
 
-    private boolean firstBootCompleted = false;
+    private boolean firstBootCompleted = true;
 
     public boolean isFirstBootCompleted() {
         return firstBootCompleted;

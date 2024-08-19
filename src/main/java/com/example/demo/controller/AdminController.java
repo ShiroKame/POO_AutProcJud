@@ -12,10 +12,16 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/admin")
@@ -33,7 +39,6 @@ public class AdminController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    
     public AdminController(BddEditor bddEditor, WebScrapper webScrapper) {
         this.bddEditor = bddEditor;
         this.webScrapper = webScrapper;
@@ -131,17 +136,27 @@ public class AdminController {
         userRepository.save(user);
         return "redirect:/admin/accesspanel";
     }
+    //SELECT * FROM YOUR_TABLE 
+    @GetMapping("/adminbdd")
+public String viewDatabase(Model model) {
+    String tableName = "YOUR_TABLE";
+    List<String> columns = bddEditor.getTableColumns(tableName);
+    List<Map<String, Object>> rows = bddEditor.getTableData(tableName);
 
-    @GetMapping("/bdd")
-    public String viewDatabase(Model model) {
-        // Obtén los nombres de las tablas y los datos
-        String tableName = "your_table"; // Reemplaza esto con el nombre real de la tabla que deseas visualizar
-        List<String> columns = bddEditor.getTableColumns(tableName);
-        List<Map<String, Object>> rows = bddEditor.getTableData(tableName);
+    // Normaliza las claves y los valores, si es necesario
+    List<Map<String, Object>> normalizedRows = rows.stream()
+        .map(row -> row.entrySet().stream()
+            .collect(Collectors.toMap(
+                Map.Entry::getKey,
+                entry -> entry.getValue() != null ? entry.getValue() : " "
+            ))
+        )
+        .collect(Collectors.toList());
 
-        model.addAttribute("columns", columns);
-        model.addAttribute("rows", rows);
+    model.addAttribute("columns", columns);
+    model.addAttribute("rows", normalizedRows); // Mantén la lista completa aquí
 
-        return "bdd"; // Devuelve la vista bdd.html
-    }
+    return "adminbdd"; // Nombre del archivo HTML sin la extensión .html
+}
+
 }
