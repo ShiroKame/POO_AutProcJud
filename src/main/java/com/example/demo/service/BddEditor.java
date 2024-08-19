@@ -95,7 +95,7 @@ public class BddEditor {
 
     @Transactional
     public void agregarRadicado(String number) {
-        jdbcTemplate.update("INSERT INTO your_table (RADICADO) VALUES (?)", number);
+        jdbcTemplate.update("INSERT INTO YOUR_TABLE (RADICADO) VALUES (?)", number);
     }
 
     public List<String> getTableColumns(String tableName) {
