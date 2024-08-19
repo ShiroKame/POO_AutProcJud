@@ -8,13 +8,11 @@
   </head>
   <body>
     <!-- Encabezado -->
-
     <header class="navbar bg-dark d-flex justify-content-center shadow">
       <h1 class="text-white">Admin Home</h1>
     </header>
 
     <!-- Cuerpo -->
-
     <div class="container">
       <div class="d-flex justify-content-center">
         <a
@@ -26,8 +24,26 @@
         </a>
       </div>
 
-      <!-- Formulario de radicados -->
+      <!-- Formulario para ver la base de datos -->
+      <form
+        class="mt-2 mb-4"
+        action="/admin/bdd"
+        method="get"
+        th:action="@{/admin/bdd}"
+      >
+        <div class="btn-group w-100 shadow" role="group" aria-label="Actions">
+          <button
+            type="submit"
+            name="action"
+            value="view-database"
+            class="btn btn-primary form-actions"
+          >
+            Ver Base de Datos
+          </button>
+        </div>
+      </form>
 
+      <!-- Formulario de radicados -->
       <form
         class="mt-2 mb-4"
         action="/admin/execute"
@@ -53,14 +69,6 @@
           />
         </div>
         <div class="btn-group w-100 shadow" role="group" aria-label="Actions">
-          <button
-            type="submit"
-            name="action"
-            value="action3"
-            class="btn btn-primary form-actions"
-          >
-            Ver Base de Datos
-          </button>
           <button
             type="submit"
             name="action"
@@ -146,3 +154,4 @@
     </script>
   </body>
 </html>
+ 

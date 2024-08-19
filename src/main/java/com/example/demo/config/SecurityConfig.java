@@ -14,7 +14,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -57,9 +56,9 @@ public class SecurityConfig {
                 .ignoringRequestMatchers("/h2-console/**") // Desactiva CSRF para la consola H2
             )
             .headers(headers -> headers
-                .httpStrictTransportSecurity(hsts -> hsts.disable()) // Desactiva HSTS si es necesario
-                .contentSecurityPolicy(csp -> csp.policyDirectives("default-src 'self'; frame-ancestors 'self'")) // Ajusta la política de seguridad de contenido
-                .frameOptions().sameOrigin() // Permite frames solo desde el mismo origen
+            .httpStrictTransportSecurity(hsts -> hsts.disable()) // Desactiva HSTS si es necesario
+            .contentSecurityPolicy(csp -> csp.policyDirectives("default-src 'self'; frame-ancestors 'self'")) // Ajusta la política de seguridad de contenido
+            .frameOptions(frameOptions -> frameOptions.sameOrigin()) // Permite frames solo desde el mismo origen
             );
 
         return http.build();

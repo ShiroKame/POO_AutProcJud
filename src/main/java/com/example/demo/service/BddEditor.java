@@ -1,6 +1,9 @@
 package com.example.demo.service;
 
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -14,7 +17,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+
+import org.apache.poi.ss.usermodel.*;
 @Service
 public class BddEditor {
 
@@ -112,5 +118,16 @@ public class BddEditor {
     @Transactional
     public void agregarRadicado(String number) {
         jdbcTemplate.update("INSERT INTO your_table (RADICADO) VALUES (?)", number);
+    }
+
+    public List<String> getTableColumns(String tableName) {
+        String sql = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = ?";
+        return jdbcTemplate.queryForList(sql, String.class, tableName);
+    }
+
+    // Método para obtener los datos de la tabla
+    public List<Map<String, Object>> getTableData(String tableName) {
+        String sql = "SELECT * FROM " + tableName;
+        return jdbcTemplate.queryForList(sql);
     }
 }
