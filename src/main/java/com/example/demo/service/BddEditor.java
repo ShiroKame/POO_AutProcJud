@@ -1,5 +1,7 @@
 package com.example.demo.service;
 
+import com.example.demo.model.Solicitud;
+import com.example.demo.repository.SolicitudRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -13,13 +15,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.Optional;
+
 
 import org.apache.poi.ss.usermodel.*;
+
 @Service
 public class BddEditor {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    private SolicitudRepository solicitudRepository;
 
     @Transactional
     public void setupExcelBdd(MultipartFile file) throws IOException {
@@ -97,20 +105,6 @@ public class BddEditor {
         jdbcTemplate.update("INSERT INTO YOUR_TABLE (RADICADO) VALUES (?)", number);
     }
 
-    public void solicitudAgregarRadicado(String number) throws Exception{
-        if (number != null && number.length() == 23) {
-            String sql = "SELECT COUNT(*) FROM YOUR_TABLE WHERE TRIM(RADICADO) = ?";
-            Integer count = jdbcTemplate.queryForObject(sql, Integer.class, number);
-
-            if (count != null && count > 0) {
-                throw new Exception("El radicado '" + number + "' ya existe en la base de datos.");
-            } else {
-                System.out.println("El radicado no existe y puede ser agregado.");
-        }
-        }else{
-            throw new Exception("radicado incorrecto, debe tener 23 digitos");
-        }
-    }
     public List<String> getTableColumns(String tableName) {
         String sql = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = ?";
         return jdbcTemplate.queryForList(sql, String.class, tableName);
@@ -144,4 +138,69 @@ public class BddEditor {
             })
             .collect(Collectors.toList());
     }     
+    
+    @Transactional
+    public void solicitudAgregarRadicado(String number) throws Exception {
+        if (number != null && number.length() == 23) {
+            String sql = "SELECT COUNT(*) FROM YOUR_TABLE WHERE TRIM(RADICADO) = ?";
+            Integer count = jdbcTemplate.queryForObject(sql, Integer.class, number);
+
+            if (count != null && count > 0) {
+                throw new Exception("El radicado '" + number + "' ya existe en la base de datos.");
+            } else {
+                // Crear y guardar la solicitud en la base de datos
+                Solicitud solicitud = new Solicitud(number, "PENDIENTE");
+                solicitudRepository.save(solicitud);
+                System.out.println("El radicado no existe y la solicitud ha sido guardada para revisión.");
+            }
+        } else {
+            throw new Exception("Radicado incorrecto, debe tener 23 dígitos.");
+        }
+    }
+
+    @Transactional
+    public void printPendingRequests() {
+        List<Solicitud> pendingRequests = solicitudRepository.findByEstado("PENDIENTE");
+        if (pendingRequests.isEmpty()) {
+            System.out.println("No hay solicitudes pendientes.");
+        } else {
+            System.out.println("Solicitudes pendientes:");
+            for (Solicitud solicitud : pendingRequests) {
+                System.out.println("ID: " + solicitud.getId() +
+                                   ", Radicado: " + solicitud.getRadicado() +
+                                   ", Estado: " + solicitud.getEstado());
+            }
+        }
+    }
+
+    // Método para obtener todas las solicitudes pendientes
+    public List<Solicitud> getPendientes() {
+        return solicitudRepository.findByEstado("PENDIENTE");
+    }
+
+    // Método para aceptar una solicitud
+    @Transactional
+    public void aceptarSolicitud(Long id) throws Exception {
+        Optional<Solicitud> solicitud = solicitudRepository.findById(id);
+        if (solicitud.isPresent()) {
+            Solicitud s = solicitud.get();
+            s.setEstado("APROBADO");
+            solicitudRepository.save(s);
+        } else {
+            throw new Exception("Solicitud no encontrada");
+        }
+    }
+
+    // Método para negar una solicitud
+    @Transactional
+    public void negarSolicitud(Long id) throws Exception {
+        Optional<Solicitud> solicitud = solicitudRepository.findById(id);
+        if (solicitud.isPresent()) {
+            Solicitud s = solicitud.get();
+            s.setEstado("RECHAZADO");
+            solicitudRepository.save(s);
+        } else {
+            throw new Exception("Solicitud no encontrada");
+        }
+    }
 }

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link rel="stylesheet" href="/public/bootstrap/css/bootstrap.css">
+    <title>Solicitudes Pendientes</title>
+</head>
+<body>
+    <header class="navbar bg-dark d-flex justify-content-center shadow">
+        <h1 class="text-white">Solicitudes Pendientes</h1>
+    </header>
+
+    <div class="container mb-4">
+        <h2 class="mt-5">Solicitudes Pendientes</h2>
+        <div class="table-container">
+            <table class="table table-striped table-info rounded-2">
+                <thead>
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Radicado</th>
+                        <th scope="col">Estado</th>
+                        <th scope="col">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="solicitud : ${pendientes}">
+                        <td th:text="${solicitud.id}"></td>
+                        <td th:text="${solicitud.radicado}"></td>
+                        <td th:text="${solicitud.estado}"></td>
+                        <td>
+                            <!-- Formulario para aceptar solicitud -->
+                            <form action="/admin/accept-petition" method="post" style="display:inline;">
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                                <input type="hidden" name="id" th:value="${solicitud.id}">
+                                <button type="submit" class="btn btn-success">Aceptar</button>
+                            </form>
+                            <!-- Formulario para negar solicitud -->
+                            <form action="/admin/reject-petition" method="post" style="display:inline;">
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                                <input type="hidden" name="id" th:value="${solicitud.id}">
+                                <button type="submit" class="btn btn-danger">Negar</button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <a href="/admin" class="btn btn-primary mt-3">Volver al Inicio</a>
+    </div>
+
+    <script src="/public/bootstrap/js/bootstrap.js"></script>
+</body>
+</html>

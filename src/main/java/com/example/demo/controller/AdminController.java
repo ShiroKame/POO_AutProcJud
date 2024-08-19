@@ -3,8 +3,10 @@ package com.example.demo.controller;
 import com.example.demo.service.BddEditor;
 import com.example.demo.service.WebScrapper;
 import com.example.demo.model.Role;
+import com.example.demo.model.Solicitud;
 import com.example.demo.model.User;
 import com.example.demo.repository.RoleRepository;
+import com.example.demo.repository.SolicitudRepository;
 import com.example.demo.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -33,6 +35,9 @@ public class AdminController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private SolicitudRepository solicitudRepository;
 
     public AdminController(BddEditor bddEditor, WebScrapper webScrapper) {
         this.bddEditor = bddEditor;
@@ -131,6 +136,7 @@ public class AdminController {
         userRepository.save(user);
         return "redirect:/admin/accesspanel";
     }
+    
     //SELECT * FROM YOUR_TABLE 
     @GetMapping("/adminbdd")
     public String viewDatabase(Model model) {
@@ -153,5 +159,37 @@ public class AdminController {
 
         return "adminbdd";
     }
+    
+    // Método para ver solicitudes pendientes
+    @GetMapping("/accesspanel/petitions")
+    public String viewPetitions(Model model) {
+        List<Solicitud> pendientes = bddEditor.getPendientes();
+        model.addAttribute("pendientes", pendientes);
+        return "petitions"; // Vista para las solicitudes
+    }
 
+    // Método para aceptar una solicitud
+    @PostMapping("/accept-petition")
+    public String acceptPetition(@RequestParam Long id, Model model) {
+        try {
+            bddEditor.aceptarSolicitud(id);
+            model.addAttribute("result", "Solicitud aceptada con éxito.");
+        } catch (Exception e) {
+            model.addAttribute("result", "Error al aceptar la solicitud: " + e.getMessage());
+        }
+        return "redirect:/admin/accesspanel/petitions";
+    }
+
+    // Método para negar una solicitud
+    @PostMapping("/reject-petition")
+    public String rejectPetition(@RequestParam Long id, Model model) {
+        try {
+            bddEditor.negarSolicitud(id);
+            model.addAttribute("result", "Solicitud rechazada con éxito.");
+        } catch (Exception e) {
+            model.addAttribute("result", "Error al rechazar la solicitud: " + e.getMessage());
+        }
+        return "redirect:/admin/accesspanel/petitions";
+    }
+//bddEditor.printPendingRequests();
 }
