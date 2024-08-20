@@ -57,7 +57,7 @@ public class SecurityConfig {
             )
             .headers(headers -> headers
             .httpStrictTransportSecurity(hsts -> hsts.disable()) // Desactiva HSTS si es necesario
-            .contentSecurityPolicy(csp -> csp.policyDirectives("default-src 'self'; frame-ancestors 'self'")) // Ajusta la política de seguridad de contenido
+            .contentSecurityPolicy(csp -> csp.policyDirectives("default-src 'self'; script-src 'self' 'unsafe-inline';")) // Ajusta la política de seguridad de contenido
             .frameOptions(frameOptions -> frameOptions.sameOrigin()) // Permite frames solo desde el mismo origen
             );
 

@@ -6,7 +6,6 @@ import com.example.demo.model.Role;
 import com.example.demo.model.Solicitud;
 import com.example.demo.model.User;
 import com.example.demo.repository.RoleRepository;
-import com.example.demo.repository.SolicitudRepository;
 import com.example.demo.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -35,9 +34,6 @@ public class AdminController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private SolicitudRepository solicitudRepository;
 
     public AdminController(BddEditor bddEditor, WebScrapper webScrapper) {
         this.bddEditor = bddEditor;
