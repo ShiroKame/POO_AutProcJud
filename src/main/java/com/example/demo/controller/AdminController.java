@@ -172,7 +172,7 @@ public class AdminController {
     @PostMapping("/accept-petition")
     public String acceptPetition(@RequestParam Long id, Model model) {
         try {
-            bddEditor.aceptarSolicitud(id);
+            bddEditor.aceptarSolicitud(id, "AgregarCaso");
             model.addAttribute("result", "Solicitud aceptada con éxito.");
         } catch (Exception e) {
             model.addAttribute("result", "Error al aceptar la solicitud: " + e.getMessage());
@@ -184,12 +184,11 @@ public class AdminController {
     @PostMapping("/reject-petition")
     public String rejectPetition(@RequestParam Long id, Model model) {
         try {
-            bddEditor.negarSolicitud(id);
+            bddEditor.negarSolicitud(id, "AgregarCaso");
             model.addAttribute("result", "Solicitud rechazada con éxito.");
         } catch (Exception e) {
             model.addAttribute("result", "Error al rechazar la solicitud: " + e.getMessage());
         }
         return "redirect:/admin/accesspanel/petitions";
     }
-//bddEditor.printPendingRequests();
 }

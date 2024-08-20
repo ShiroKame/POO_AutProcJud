@@ -17,6 +17,7 @@
                     <tr>
                         <th scope="col">ID</th>
                         <th scope="col">Radicado</th>
+                        <th scope="col">Tipo de Petición</th>
                         <th scope="col">Estado</th>
                         <th scope="col">Acciones</th>
                     </tr>
@@ -25,6 +26,7 @@
                     <tr th:each="solicitud : ${pendientes}">
                         <td th:text="${solicitud.id}"></td>
                         <td th:text="${solicitud.radicado}"></td>
+                        <td th:text="${solicitud.tipo}"></td>
                         <td th:text="${solicitud.estado}"></td>
                         <td>
                             <!-- Formulario para aceptar solicitud -->

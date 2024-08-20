@@ -101,10 +101,12 @@ public class BddEditor {
 
     @Transactional
     public void agregarRadicado(String number) {
-
-        jdbcTemplate.update("INSERT INTO YOUR_TABLE (RADICADO) VALUES (?)", number);
+        String sql = "INSERT INTO YOUR_TABLE (RADICADO) VALUES (?)";
+        jdbcTemplate.update(sql, number);
     }
-
+    public void cerrarCaso(String number) {
+        System.out.println("temp");
+    }
     public List<String> getTableColumns(String tableName) {
         String sql = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = ?";
         return jdbcTemplate.queryForList(sql, String.class, tableName);
@@ -149,7 +151,7 @@ public class BddEditor {
                 throw new Exception("El radicado '" + number + "' ya existe en la base de datos.");
             } else {
                 // Crear y guardar la solicitud en la base de datos
-                Solicitud solicitud = new Solicitud(number, "PENDIENTE");
+                Solicitud solicitud = new Solicitud(number, "PENDIENTE", "AgregarCaso");
                 solicitudRepository.save(solicitud);
                 System.out.println("El radicado no existe y la solicitud ha sido guardada para revisión.");
             }
@@ -180,12 +182,19 @@ public class BddEditor {
 
     // Método para aceptar una solicitud
     @Transactional
-    public void aceptarSolicitud(Long id) throws Exception {
+    public void aceptarSolicitud(Long id, String tipoSolicitud) throws Exception {
         Optional<Solicitud> solicitud = solicitudRepository.findById(id);
         if (solicitud.isPresent()) {
             Solicitud s = solicitud.get();
             s.setEstado("APROBADO");
             solicitudRepository.save(s);
+            if(tipoSolicitud.equals("AgregarCaso")){
+                agregarRadicado(solicitud.get().getRadicado());
+            }else if(tipoSolicitud.equals("CerrarCaso")){
+                cerrarCaso(solicitud.get().getRadicado());
+            }else{
+                throw new Exception("Tipo de solicitud no válido");
+            }
         } else {
             throw new Exception("Solicitud no encontrada");
         }
@@ -193,7 +202,7 @@ public class BddEditor {
 
     // Método para negar una solicitud
     @Transactional
-    public void negarSolicitud(Long id) throws Exception {
+    public void negarSolicitud(Long id, String tipoSolicitud) throws Exception {
         Optional<Solicitud> solicitud = solicitudRepository.findById(id);
         if (solicitud.isPresent()) {
             Solicitud s = solicitud.get();

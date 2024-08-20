@@ -16,12 +16,15 @@ public class Solicitud {
 
     private String estado; // Puede ser "PENDIENTE", "APROBADO", "RECHAZADO"
 
+    private String tipo;
+
     // Constructores
     public Solicitud() {}
 
-    public Solicitud(String radicado, String estado) {
+    public Solicitud(String radicado, String estado, String tipoSolicitud) {
         this.radicado = radicado;
         this.estado = estado;
+        this.tipo = tipoSolicitud;
     }
 
     // Getters y setters
@@ -47,5 +50,11 @@ public class Solicitud {
 
     public void setEstado(String estado) {
         this.estado = estado;
+    }
+    public String getTipo(){
+        return tipo;
+    }
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
     }
 }
