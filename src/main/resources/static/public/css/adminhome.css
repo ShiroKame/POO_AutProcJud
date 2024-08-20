@@ -1,19 +1,42 @@
-body{
-    /* background-image: url(/images/14547779_rm222-mind-14.svg); */
-    background: url("../images/14547779_rm222-mind-14.svg");
-    background-size: cover;
-    background-repeat: repeat;
+body {
+  min-height: 100vh;
+  position: relative;
 }
 
-.container .resultado{
+body::before {
+  content: '';
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.5;
+  z-index: -10;
+  background: url(../images/14547779_rm222-mind-14.svg);
+  background-size: cover;
+  background-repeat: repeat;
+}
+
+.container .resultado {
+  display: none;
+}
+
+.container .show {
+  display: block;
+}
+
+.container .table-container {
+  max-height: 750px;
+  overflow: auto;
+}
+
+@media (max-width: 767.98px) {
+  .container {
+    max-width: 90% !important;
+  }
+
+  .container .hide-mobile {
     display: none;
-}
-
-.container .show{
-    display: block;
-}
-
-.container .table-container{
-    max-height: 750px;
-    overflow: auto;
+  }
 }

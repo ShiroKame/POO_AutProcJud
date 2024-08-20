@@ -1,7 +1,8 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
   <head>
-    <!-- <link rel="stylesheet" href="bootstrap/css/bootstrap.css" /> -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="/public/bootstrap/css/bootstrap.css" />
     <link rel="stylesheet" href="/public/css/adminhome.css" />
     <title>Admin Home</title>
@@ -13,12 +14,13 @@
     </header>
 
     <!-- Cuerpo -->
-    <div class="container">
+    <div class="container pb-4">
       <div class="d-flex justify-content-center">
         <a
           href="/admin/accesspanel"
-          class="btn btn-warning w-25 shadow mt-4 d-flex justify-content-around"
+          class="btn btn-warning mw-25 shadow mt-4 d-flex gap-2 justify-content-around"
         >
+          <img src="/public/icons/gear-icon.svg" alt="" width="20px" />
           Configuración
         </a>
       </div>
@@ -82,7 +84,7 @@
             value="action2"
             class="btn btn-primary form-actions"
           >
-            Buscar en la rama
+            Buscar <span class="hide-mobile">en la rama</span>
           </button>
         </div>
       </form>
@@ -116,7 +118,7 @@
           </p>
           <h3>Acciones:</h3>
 
-          <div class="table-container mb-4">
+          <div class="table-container">
             <table class="table table-striped table-info rounded-2 shadow">
               <thead>
                 <tr>
@@ -143,7 +145,7 @@
         </div>
       </div>
     </div>
-    
+
     <script nonce="abc123">
       if (/\/execute$/g.test(this.location.pathname)) {
         document.querySelector('.resultado').classList.add('show')
@@ -151,6 +153,6 @@
         document.querySelector('.resultado').classList.remove('show')
       }
     </script>
+    <script src="/public/bootstrap/js/bootstrap.js"></script>
   </body>
 </html>
- 

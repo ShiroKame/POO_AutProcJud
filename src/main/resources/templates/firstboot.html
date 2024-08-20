@@ -1,70 +1,88 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <link rel="stylesheet" href="/public/bootstrap/css/bootstrap.css">
-    <link rel="stylesheet" href="/public/css/firstboot.css">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/public/bootstrap/css/bootstrap.css" />
+    <link rel="stylesheet" href="/public/css/firstboot.css" />
     <title>First Boot Setup</title>
-</head>
-<body>
+  </head>
+  <body>
     <header class="navbar bg-dark d-flex justify-content-center shadow">
-        <h1 class="text-white">Setup Inicial</h1>
+      <h1 class="text-white">Setup Inicial</h1>
     </header>
-    
+
     <div class="container">
-        <!-- Formulario de carga de archivo -->
-        <form id="uploadForm" action="/firstboot/upload" method="post" enctype="multipart/form-data" th:action="@{/firstboot/upload}">
-            <!-- CSRF Token -->
-            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+      <!-- Formulario de carga de archivo -->
+      <form
+        id="uploadForm"
+        action="/firstboot/upload"
+        method="post"
+        enctype="multipart/form-data"
+        th:action="@{/firstboot/upload}"
+      >
+        <!-- CSRF Token -->
+        <input
+          type="hidden"
+          th:name="${_csrf.parameterName}"
+          th:value="${_csrf.token}"
+        />
 
-            <!-- Zona de arrastrar y soltar -->
-            <div id="dropZone" class="mt-4 bg-light rounded p-4 text-center">Arrastra y suelta un archivo aquí o haz clic para seleccionar uno</div>
-            
-            <!-- Input de archivo oculto -->
-            <input type="file" id="fileInput" name="file" class="d-none" required>
-
-            <button type="submit" class="btn btn-primary w-100 shadow mt-3">Cargar</button>
-        </form>
-    
-        <div th:if="${error != null}" class="mt-3 alert alert-danger">
-            <p th:text="${error}"></p>
+        <!-- Zona de arrastrar y soltar -->
+        <div id="dropZone" class="mt-4 bg-light rounded p-4 text-center">
+          Arrastra y suelta un archivo aquí o haz clic para seleccionar uno
         </div>
+
+        <!-- Input de archivo oculto -->
+        <input type="file" id="fileInput" name="file" class="d-none" required />
+
+        <button type="submit" class="btn btn-primary w-100 shadow mt-3">
+          Cargar
+        </button>
+      </form>
+
+      <div th:if="${error != null}" class="mt-3 alert alert-danger">
+        <p th:text="${error}"></p>
+      </div>
     </div>
 
     <script>
-        const dropZone = document.getElementById('dropZone');
-        const fileInput = document.getElementById('fileInput');
-        const uploadForm = document.getElementById('uploadForm');
+      const dropZone = document.getElementById('dropZone')
+      const fileInput = document.getElementById('fileInput')
+      const uploadForm = document.getElementById('uploadForm')
 
-        // Abrir el selector de archivos cuando se hace clic en la zona de arrastrar y soltar
-        dropZone.addEventListener('click', () => fileInput.click());
+      // Abrir el selector de archivos cuando se hace clic en la zona de arrastrar y soltar
+      dropZone.addEventListener('click', () => fileInput.click())
 
-        // Manejar el evento de arrastrar y soltar
-        dropZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            dropZone.classList.add('dragover');
-        });
+      // Manejar el evento de arrastrar y soltar
+      dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault()
+        dropZone.classList.add('dragover')
+      })
 
-        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+      dropZone.addEventListener('dragleave', () =>
+        dropZone.classList.remove('dragover')
+      )
 
-        dropZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            dropZone.classList.remove('dragover');
-            const files = e.dataTransfer.files;
-            if (files.length > 0) {
-                fileInput.files = files;
+      dropZone.addEventListener('drop', (e) => {
+        e.preventDefault()
+        dropZone.classList.remove('dragover')
+        const files = e.dataTransfer.files
+        if (files.length > 0) {
+          fileInput.files = files
 
-                // Actualizar el texto de la zona con el nombre del archivo seleccionado
-                dropZone.textContent = `Archivo seleccionado: ${fileInput.files[0].name}`;
-            }
-        });
+          // Actualizar el texto de la zona con el nombre del archivo seleccionado
+          dropZone.textContent = `Archivo seleccionado: ${fileInput.files[0].name}`
+        }
+      })
 
-        // Actualizar el texto de la zona con el nombre del archivo seleccionado si se elige manualmente
-        fileInput.addEventListener('change', () => {
-            if (fileInput.files.length > 0) {
-                dropZone.textContent = `Archivo seleccionado: ${fileInput.files[0].name}`;
-            }
-        });
+      // Actualizar el texto de la zona con el nombre del archivo seleccionado si se elige manualmente
+      fileInput.addEventListener('change', () => {
+        if (fileInput.files.length > 0) {
+          dropZone.textContent = `Archivo seleccionado: ${fileInput.files[0].name}`
+        }
+      })
     </script>
     <script src="/public/bootstrap/js/bootstrap.js"></script>
-</body>
+  </body>
 </html>
