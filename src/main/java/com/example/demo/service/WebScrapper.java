@@ -30,14 +30,14 @@ public class WebScrapper {
         // Manejo de idProceso como Object
         Object idProcesoObject = result.getJSONArray("procesos").getJSONObject(0).opt("idProceso");
         String procesoId = idProcesoObject != null ? idProcesoObject.toString() : null;
-
+        System.out.println("a"+procesoId);
         if (procesoId == null) {
             throw new Exception("ID del proceso no encontrado");
         }
 
         String detalleUrl = "https://consultaprocesos.ramajudicial.gov.co:448/api/v2/Proceso/Detalle/" + procesoId;
         JSONObject resultDetail = new JSONObject(sendGetRequest(detalleUrl));
-
+        System.out.println("b");
         Map<String, Object> process = new HashMap<>();
         Map<String, Object> processDetails = new HashMap<>();
         processDetails.put("key_procces", radNumber);
@@ -48,11 +48,11 @@ public class WebScrapper {
         List<Map<String, String>> actions = new ArrayList<>();
         processDetails.put("actions", actions);
         process.put("process", processDetails);
-
+        System.out.println("c");
         String actuacionesUrl = "https://consultaprocesos.ramajudicial.gov.co:448/api/v2/Proceso/Actuaciones/" + procesoId;
         JSONObject resultAction = new JSONObject(sendGetRequest(actuacionesUrl));
         int pages = resultAction.getJSONObject("paginacion").getInt("cantidadPaginas");
-
+        System.out.println("d");
         for (int pag = 0; pag < pages; pag++) {
             if (pages > 1) {
                 resultAction = new JSONObject(sendGetRequest(actuacionesUrl + "?pagina=" + (pag + 1)));
@@ -109,12 +109,20 @@ public class WebScrapper {
 
         // Procesar cada radicado
         for (String radicado : radicadosArray) {
+            int contador =0;
             System.out.println(radicado);
             try{
                 this.queryProcess(radicado);
             }catch(Exception e){
-                e.printStackTrace();
+                contador++;
+                if(e.getMessage().contains("GET request not worked")){
+                    System.out.println("error get");
+                }else if(e.getMessage().contains("JSONArray[0]")){
+                    System.out.println("error json");
+                }
+                //e.printStackTrace();
             }
+            System.out.println("contador:"+contador);
         }
     }
 }

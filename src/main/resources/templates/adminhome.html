@@ -44,6 +44,26 @@
         </div>
       </form>
 
+      <!-- Formulario para procesar bdd -->
+      <form
+        class="mt-2 mb-4"
+        action="/admin/procesar-bdd"
+        method="post"
+        th:action="@{/admin/procesar-bdd}"
+      >
+        <div class="btn-group w-100 shadow" role="group" aria-label="Actions">
+          <button
+            type="submit"
+            name="action"
+            value="procesar-bdd"
+            class="btn btn-primary form-actions"
+          >
+            procesar Base de Datos
+          </button>
+        </div>
+      </form>
+      
+
       <!-- Formulario de radicados -->
       <form
         class="mt-2 mb-4"

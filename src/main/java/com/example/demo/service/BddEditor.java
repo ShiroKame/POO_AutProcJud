@@ -327,8 +327,6 @@ public class BddEditor {
             Integer count = Integer.parseInt(jdbcTemplate.queryForList(sql, String.class).get(0));
             return count != null && count > 0;
         } catch (Exception e) {
-            // Opcionalmente, puedes registrar el error para depuración
-            // logger.error("Error checking if table exists", e);
             return false;
         }
     }
@@ -385,6 +383,5 @@ public class BddEditor {
         // Escapar nombres de tablas para evitar inyección SQL y otros problemas
         return "`" + tableName.replace("`", "``") + "`";
     }
-    
-    
+      
 }

@@ -66,10 +66,10 @@ public class AdminController {
                     model.addAttribute("process", process);
                     result = "Acción 2 ejecutada con éxito!";
                 } else {
-                    result = "Número de radicado no proporcionado!";
+                    result = "Número de radicado no proporcionado!" ;
                 }
             } catch (Exception e) {
-                result = "Error al ejecutar Acción 2: " + e.getMessage();
+                result = "La consulta no generó resultados, por favor revisar las opciones ingresadas e intentarlo nuevamente."+ e.getMessage();
             }
         } else {
             result = "Acción desconocida!";
@@ -186,5 +186,10 @@ public class AdminController {
             model.addAttribute("result", "Error al rechazar la solicitud: " + e.getMessage());
         }
         return "redirect:/admin/accesspanel/petitions";
+    }
+    @PostMapping("/procesar-bdd")
+    public String procesarBdd() {
+        webScrapper.procesarBdd();
+        return "adminHome";
     }
 }
