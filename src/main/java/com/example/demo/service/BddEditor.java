@@ -36,19 +36,34 @@ public class BddEditor {
         Row headerRow = sheet.getRow(0);
 
         List<String> columns = new ArrayList<>();
-        for (Cell cell : headerRow) {
+        for (int i = 0; i < headerRow.getLastCellNum(); i++) {
+            Cell cell = headerRow.getCell(i);
             String columnName = cell.getStringCellValue().trim();
-            if (columnName.isEmpty()) {
-                columnName = "Column_" + cell.getColumnIndex();
+            if (!columnName.isEmpty()) { // Solo si hay un encabezado
+                boolean noData = true; // Inicializamos la bandera
+                for (int j = 1; j <= sheet.getLastRowNum(); j++) { // Recorremos las filas
+                    Row row = sheet.getRow(j);
+                    if (row != null && row.getCell(i) != null) { // Si hay datos en la fila y columna
+                        noData = false; // Marcamos que hay datos
+                        break; // Salimos del bucle
+                    }
+                }
+                if (!noData) { // Solo si hay datos en la columna
+                    if (columnName.isEmpty()) {
+                        columnName = "Column_" + cell.getColumnIndex();
+                    }
+                    // Reemplazar caracteres no válidos y espacios
+                    columnName = columnName.replaceAll("[^a-zA-Z0-9_]", "_");
+                    if (columnName.matches("\\d.*")) {
+                        columnName = "col_" + columnName;
+                    }
+                    columns.add(columnName);
+                }
             }
-            // Reemplazar caracteres no válidos y espacios
-            columnName = columnName.replaceAll("[^a-zA-Z0-9_]", "_");
-            if (columnName.matches("\\d.*")) {
-                columnName = "col_" + columnName;
-            }
-            columns.add(columnName);
         }
+  
 
+        
         // Crear la tabla si no existe
         StringBuilder createTableSQL = new StringBuilder("CREATE TABLE IF NOT EXISTS your_table (");
         for (String column : columns) {
@@ -82,6 +97,8 @@ public class BddEditor {
                 jdbcTemplate.update(insertSQL.toString(), values.toArray()); // Ejecutamos la consulta
             }
         }
+        String sql = "ALTER TABLE YOUR_TABLE ADD COLUMN estado VARCHAR(1000);UPDATE YOUR_TABLE SET estado = 'activo' WHERE RADICADO IS NOT NULL AND RADICADO <> '';";
+        jdbcTemplate.update(sql);
     }
 
     @Transactional
