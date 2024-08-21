@@ -122,6 +122,8 @@ public class BddEditor {
         jdbcTemplate.update(sql, number);
     }
     public void cerrarCaso(String number) {
+        String sql = "UPDATE YOUR_TABLE SET estado = 'cerrado' WHERE RADICADO = VALUES (?)";
+        jdbcTemplate.update(sql, number);
         System.out.println("temp");
     }
     public List<String> getTableColumns(String tableName) {
