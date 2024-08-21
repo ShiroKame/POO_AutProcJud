@@ -118,7 +118,7 @@ public class BddEditor {
 
     @Transactional
     public void agregarRadicado(String number) {
-        String sql = "INSERT INTO YOUR_TABLE (RADICADO) VALUES (?)";
+        String sql = "INSERT INTO YOUR_TABLE (RADICADO, estado) VALUES (?, 'activo')";
         jdbcTemplate.update(sql, number);
     }
     public void cerrarCaso(String number) {
