@@ -12,10 +12,13 @@ import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class WebScrapper {
+    @Autowired
+    private BddEditor bddEditor;
 
     private static final String USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36";
 
@@ -70,7 +73,7 @@ public class WebScrapper {
                 }
             }
         }
-
+        bddEditor.printAndSaveActions(process);
         return process;
     }
 
@@ -96,4 +99,23 @@ public class WebScrapper {
             throw new Exception("GET request not worked");
         }
     }
+
+    public void procesarBdd() {
+        // Obtener la lista de números de radicado con estado 'activo'
+        List<String> radicadosActivos = bddEditor.getRadicadosActivos();
+    
+        // Ordenar la lista en un array
+        String[] radicadosArray = radicadosActivos.toArray(new String[0]);
+
+        // Procesar cada radicado
+        for (String radicado : radicadosArray) {
+            System.out.println(radicado);
+            try{
+                this.queryProcess(radicado);
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+        }
+    }
 }
+

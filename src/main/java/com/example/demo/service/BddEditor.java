@@ -11,11 +11,12 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.sql.ResultSet;
+import java.text.SimpleDateFormat;
 import java.util.stream.Collectors;
-import java.util.Optional;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 
 import org.apache.poi.ss.usermodel.*;
@@ -124,7 +125,6 @@ public class BddEditor {
     public void cerrarCaso(String number) {
         String sql = "UPDATE YOUR_TABLE SET estado = 'cerrado' WHERE RADICADO = VALUES (?)";
         jdbcTemplate.update(sql, number);
-        System.out.println("temp");
     }
     public List<String> getTableColumns(String tableName) {
         String sql = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = ?";
@@ -231,4 +231,146 @@ public class BddEditor {
             throw new Exception("Solicitud no encontrada");
         }
     }
+    public List<String> getRadicadosActivos() {
+        String sql = "SELECT DISTINCT TRIM(RADICADO) FROM YOUR_TABLE WHERE ESTADO = 'activo'";
+        return jdbcTemplate.queryForList(sql, String.class);
+    }
+    public void printAndSaveActions(Map<String, Object> process) {
+        if (process.containsKey("process")) {
+            Map<String, Object> processDetails = (Map<String, Object>) process.get("process");
+            if (processDetails.containsKey("actions")) {
+                List<Map<String, String>> actions = (List<Map<String, String>>) processDetails.get("actions");
+                
+                // Encontrar la actuación más reciente
+                Map<String, String> latestAction = null;
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+                Date latestDate = null;
+    
+                for (Map<String, String> action : actions) {
+                    String actionDateStr = action.get("action_date");
+                    if (actionDateStr != null && !actionDateStr.isEmpty()) {
+                        try {
+                            Date actionDate = sdf.parse(actionDateStr);
+                            if (latestDate == null || actionDate.after(latestDate)) {
+                                latestDate = actionDate;
+                                latestAction = action;
+                            }
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+    
+                if (latestAction != null) {
+                    String radicado = (String) processDetails.get("key_procces");
+                    if (radicado != null) {
+                        // Verificar si la tabla existe y comparar datos
+                        boolean tableExists = checkIfTableExists(radicado);
+                        if (tableExists) {
+                            Map<String, String> oldAction = getLatestAction(radicado);
+    
+                            // Imprimir datos antiguos y nuevos para comparación
+                            System.out.println("Datos antiguos en la base de datos:");
+                            if (oldAction != null) {
+                                System.out.println("Action Date: " + oldAction.get("action_date"));
+                                System.out.println("Action: " + oldAction.get("action"));
+                                System.out.println("Annotation: " + oldAction.get("annotation"));
+                                System.out.println("Start Date: " + oldAction.get("start_date"));
+                                System.out.println("End Date: " + oldAction.get("end_date"));
+                                System.out.println("Registration Date: " + oldAction.get("registration_date"));
+                            } else {
+                                System.out.println("No se encontraron datos antiguos.");
+                            }
+    
+                            if (oldAction != null && isSameAction(latestAction, oldAction)) {
+                                System.out.println("No han habido cambios.");
+                            } else {
+                                saveAction(radicado, latestAction);
+                                System.out.println("La base de datos se actualizó.");
+                            }
+                        } else {
+                            // Crear la tabla y guardar los datos si la tabla no existe
+                            createTableIfNotExists(radicado);
+                            saveAction(radicado, latestAction);
+                            System.out.println("La base de datos se creó y se actualizó.");
+                        }
+                    }
+                } else {
+                    System.out.println("No se encontraron actuaciones.");
+                }
+            } else {
+                System.out.println("No se encontraron actuaciones.");
+            }
+        } else {
+            System.out.println("El mapa no contiene la clave 'process'.");
+        }
+    }
+
+
+    private boolean checkIfTableExists(String radicado) {
+        try {
+            String sql = "SELECT COUNT(*) AS count FROM information_schema.tables WHERE table_schema = 'PUBLIC' AND table_name = '"+radicado+"'";
+            Integer count = Integer.parseInt(jdbcTemplate.queryForList(sql, String.class).get(0));
+            return count != null && count > 0;
+        } catch (Exception e) {
+            // Opcionalmente, puedes registrar el error para depuración
+            // logger.error("Error checking if table exists", e);
+            return false;
+        }
+    }
+
+    private Map<String, String> getLatestAction(String radicado) {
+        try {
+            String sql = "SELECT * FROM " + escapeTableName(radicado) + " ORDER BY action_date DESC LIMIT 1";
+            return jdbcTemplate.queryForObject(sql, (ResultSet rs, int rowNum) -> {
+                Map<String, String> action = new HashMap<>();
+                action.put("action_date", rs.getString("action_date"));
+                action.put("action", rs.getString("action"));
+                action.put("annotation", rs.getString("annotation"));
+                action.put("start_date", rs.getString("start_date"));
+                action.put("end_date", rs.getString("end_date"));
+                action.put("registration_date", rs.getString("registration_date"));
+                return action;
+            });
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private boolean isSameAction(Map<String, String> newAction, Map<String, String> oldAction) {
+        return newAction.equals(oldAction);
+    }
+
+    private void createTableIfNotExists(String radicado) {
+        String sql = "CREATE TABLE IF NOT EXISTS " + escapeTableName(radicado) + " (" +
+                     "id INT AUTO_INCREMENT PRIMARY KEY, " +
+                     "action_date VARCHAR(255), " +
+                     "action VARCHAR(255), " +
+                     "annotation VARCHAR(255), " +
+                     "start_date VARCHAR(255), " +
+                     "end_date VARCHAR(255), " +
+                     "registration_date VARCHAR(255))";
+
+        jdbcTemplate.execute(sql);
+    }
+
+    private void saveAction(String radicado, Map<String, String> action) {
+        String sql = "INSERT INTO " + escapeTableName(radicado) + " (action_date, action, annotation, start_date, end_date, registration_date) VALUES (?, ?, ?, ?, ?, ?)";
+
+        jdbcTemplate.update(sql,
+            action.get("action_date"),
+            action.get("action"),
+            action.get("annotation"),
+            action.get("start_date"),
+            action.get("end_date"),
+            action.get("registration_date")
+        );
+    }
+
+    private String escapeTableName(String tableName) {
+        // Escapar nombres de tablas para evitar inyección SQL y otros problemas
+        return "`" + tableName.replace("`", "``") + "`";
+    }
+    
+    
 }
