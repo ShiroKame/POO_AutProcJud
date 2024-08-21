@@ -15,7 +15,6 @@ import java.sql.ResultSet;
 import java.text.SimpleDateFormat;
 import java.util.stream.Collectors;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 
@@ -235,75 +234,90 @@ public class BddEditor {
         String sql = "SELECT DISTINCT TRIM(RADICADO) FROM YOUR_TABLE WHERE ESTADO = 'activo'";
         return jdbcTemplate.queryForList(sql, String.class);
     }
-    public void printAndSaveActions(Map<String, Object> process) {
-        if (process.containsKey("process")) {
-            Map<String, Object> processDetails = (Map<String, Object>) process.get("process");
-            if (processDetails.containsKey("actions")) {
-                List<Map<String, String>> actions = (List<Map<String, String>>) processDetails.get("actions");
-                
-                // Encontrar la actuación más reciente
-                Map<String, String> latestAction = null;
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-                Date latestDate = null;
-    
-                for (Map<String, String> action : actions) {
-                    String actionDateStr = action.get("action_date");
-                    if (actionDateStr != null && !actionDateStr.isEmpty()) {
-                        try {
-                            Date actionDate = sdf.parse(actionDateStr);
-                            if (latestDate == null || actionDate.after(latestDate)) {
-                                latestDate = actionDate;
-                                latestAction = action;
+    @SuppressWarnings("unchecked")
+    public void printAndSaveActions(Map<String, Object> process, String nradicado) {
+        boolean radicadoActivo = false;
+        List<String> radicadosActivos = getRadicadosActivos();
+        for (String radicado : radicadosActivos) {
+            if (radicado.equals(nradicado)) {
+                radicadoActivo = true;
+                break;
+            }
+        }
+        if (radicadoActivo) {
+            System.out.println("radicado activo");
+            if (process.containsKey("process")) {
+                Map<String, Object> processDetails = (Map<String, Object>) process.get("process");
+                if (processDetails.containsKey("actions")) {
+                    List<Map<String, String>> actions = (List<Map<String, String>>) processDetails.get("actions");
+                    
+                    // Encontrar la actuación más reciente
+                    Map<String, String> latestAction = null;
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+                    Date latestDate = null;
+        
+                    for (Map<String, String> action : actions) {
+                        String actionDateStr = action.get("action_date");
+                        if (actionDateStr != null && !actionDateStr.isEmpty()) {
+                            try {
+                                Date actionDate = sdf.parse(actionDateStr);
+                                if (latestDate == null || actionDate.after(latestDate)) {
+                                    latestDate = actionDate;
+                                    latestAction = action;
+                                }
+                            } catch (ParseException e) {
+                                e.printStackTrace();
                             }
-                        } catch (ParseException e) {
-                            e.printStackTrace();
                         }
                     }
-                }
-    
-                if (latestAction != null) {
-                    String radicado = (String) processDetails.get("key_procces");
-                    if (radicado != null) {
-                        // Verificar si la tabla existe y comparar datos
-                        boolean tableExists = checkIfTableExists(radicado);
-                        if (tableExists) {
-                            Map<String, String> oldAction = getLatestAction(radicado);
-    
-                            // Imprimir datos antiguos y nuevos para comparación
-                            System.out.println("Datos antiguos en la base de datos:");
-                            if (oldAction != null) {
-                                System.out.println("Action Date: " + oldAction.get("action_date"));
-                                System.out.println("Action: " + oldAction.get("action"));
-                                System.out.println("Annotation: " + oldAction.get("annotation"));
-                                System.out.println("Start Date: " + oldAction.get("start_date"));
-                                System.out.println("End Date: " + oldAction.get("end_date"));
-                                System.out.println("Registration Date: " + oldAction.get("registration_date"));
+        
+                    if (latestAction != null) {
+                        String radicado = (String) processDetails.get("key_procces");
+                        if (radicado != null) {
+                            // Verificar si la tabla existe y comparar datos
+                            boolean tableExists = checkIfTableExists(radicado);
+                            if (tableExists) {
+                                Map<String, String> oldAction = getLatestAction(radicado);
+                                
+                                // Imprimir datos antiguos y nuevos para comparación
+                                System.out.println("Datos antiguos en la base de datos:");
+                                if (oldAction != null) {
+                                    System.out.println("Action Date: " + oldAction.get("action_date"));
+                                    System.out.println("Action: " + oldAction.get("action"));
+                                    System.out.println("Annotation: " + oldAction.get("annotation"));
+                                    System.out.println("Start Date: " + oldAction.get("start_date"));
+                                    System.out.println("End Date: " + oldAction.get("end_date"));
+                                    System.out.println("Registration Date: " + oldAction.get("registration_date"));
+                                } else {
+                                    System.out.println("No se encontraron datos antiguos.");
+                                }
+        
+                                if (oldAction != null && isSameAction(latestAction, oldAction)) {
+                                    System.out.println("No han habido cambios.");
+                                } else {
+                                    saveAction(radicado, latestAction);
+                                    System.out.println("La base de datos se actualizó.");
+                                }
                             } else {
-                                System.out.println("No se encontraron datos antiguos.");
-                            }
-    
-                            if (oldAction != null && isSameAction(latestAction, oldAction)) {
-                                System.out.println("No han habido cambios.");
-                            } else {
+                                // Crear la tabla y guardar los datos si la tabla no existe
+                                createTableIfNotExists(radicado);
                                 saveAction(radicado, latestAction);
-                                System.out.println("La base de datos se actualizó.");
+                                System.out.println("La base de datos se creó y se actualizó.");
                             }
-                        } else {
-                            // Crear la tabla y guardar los datos si la tabla no existe
-                            createTableIfNotExists(radicado);
-                            saveAction(radicado, latestAction);
-                            System.out.println("La base de datos se creó y se actualizó.");
                         }
+                    } else {
+                        System.out.println("No se encontraron actuaciones.");
                     }
                 } else {
                     System.out.println("No se encontraron actuaciones.");
                 }
             } else {
-                System.out.println("No se encontraron actuaciones.");
+                System.out.println("El mapa no contiene la clave 'process'.");
             }
-        } else {
-            System.out.println("El mapa no contiene la clave 'process'.");
+        }else{
+            System.out.println("radicado inactivo");
         }
+        
     }
 
 

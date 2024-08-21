@@ -73,7 +73,7 @@ public class WebScrapper {
                 }
             }
         }
-        bddEditor.printAndSaveActions(process);
+        bddEditor.printAndSaveActions(process,radNumber);
         return process;
     }
 
