@@ -13,6 +13,7 @@ import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -123,6 +124,15 @@ public class WebScrapper {
                 //e.printStackTrace();
             }
             System.out.println("contador:"+contador);
+        }
+    }
+    @Scheduled(cron = "0 0 5 * * ?")
+    public void scheduledProcesarBdd() {
+        try {
+            procesarBdd();
+        } catch (Exception e) {
+            // Manejo de excepciones
+            e.printStackTrace();
         }
     }
 }

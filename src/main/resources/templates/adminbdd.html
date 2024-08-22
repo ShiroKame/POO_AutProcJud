@@ -1,43 +1,65 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/public/bootstrap/css/bootstrap.css" />
     <title>Database Viewer</title>
-    <style>
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-    </style>
 </head>
 <body>
-    <h1>Datos de la Tabla</h1>
-    <table>
-        <thead>
-            <tr>
-                <!-- Renderiza los encabezados de la tabla -->
-                <th th:each="column : ${columns}" th:text="${column}"></th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Renderiza las filas de datos -->
-            <tr th:each="row : ${rows}">
-                <!-- Por cada columna, renderiza el valor correspondiente en la fila -->
-                <td th:each="column : ${columns}" th:text="${row.get(column)}">No Data</td>
-            </tr>
-        </tbody>
-    </table>
+    <form id="dataForm" action="/admin/adminbdd/save" method="post">
+        <table id="dataTable">
+            <thead>
+                <tr>
+                    <th th:each="column : ${columns}" th:text="${column}"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="row, rowIndex : ${rows}">
+                    <input type="hidden" name="rowIndex" th:value="${rowIndex}"/>
+                    <td th:each="column : ${columns}">
+                        <input type="text" 
+                            th:name="${column}" 
+                            th:value="${row.get(column)}"
+                            th:readonly="${column == 'RADICADO'}" >
+                    </td>
+                </tr>
+            </tbody> 
+        </table>
+        <button type="button" onclick="submitTableData()" class="btn btn-primary">Guardar</button>
+    </form>
+
+    <script>
+        function submitTableData() {
+            var form = document.getElementById('dataForm');
+            var table = document.getElementById('dataTable');
+            var rows = table.querySelectorAll('tbody tr');
+            var tableData = [];
+
+            rows.forEach(row => {
+                var rowData = {};
+                var inputs = row.querySelectorAll('input[type="text"]');
+                inputs.forEach(input => {
+                    rowData[input.name] = input.value;
+                });
+                tableData.push(rowData);
+            });
+
+            fetch(form.action, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(tableData)
+            })
+            .then(response => response.text())
+            .then(result => {
+                console.log(result);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
 </body>
 </html>
-

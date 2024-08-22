@@ -2,6 +2,11 @@ package com.example.demo.controller;
 
 import com.example.demo.service.BddEditor;
 import com.example.demo.service.WebScrapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import jakarta.servlet.http.HttpServletRequest;
+
 import com.example.demo.model.Role;
 import com.example.demo.model.Solicitud;
 import com.example.demo.model.User;
@@ -12,12 +17,19 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.annotation.RequestScope;
+import org.springframework.http.ResponseEntity;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Controller
 @RequestMapping("/admin")
@@ -192,4 +204,25 @@ public class AdminController {
         webScrapper.procesarBdd();
         return "adminHome";
     }
+    
+    // En su lugar, usamos  para recibir el formulario entero como un JSON.
+    @PostMapping("/adminbdd/save")
+    public ResponseEntity<String> saveTableData(@RequestBody List<Map<String, String>> tableData) {
+        // Procesar los datos de la tabla
+        System.out.println("Datos de la tabla recibidos: " + tableData);
+        return ResponseEntity.ok("Datos guardados con éxito");
+    }
+    @PostMapping("/save")
+    public ResponseEntity<String> saveTableDataa(@RequestBody List<Map<String, String>> tableData) {
+        // Procesar los datos de la tabla
+        System.out.println("Datos de la tabla recibidos: " + tableData);
+        return ResponseEntity.ok("Datos guardados con éxito");
+    }
+    @PostMapping("/admin/adminbdd/save")
+    public ResponseEntity<String> saveTableDatab(@RequestBody List<Map<String, String>> tableData) {
+        // Procesar los datos de la tabla
+        System.out.println("Datos de la tabla recibidos: " + tableData);
+        return ResponseEntity.ok("Datos guardados con éxito");
+    }
 }
+    

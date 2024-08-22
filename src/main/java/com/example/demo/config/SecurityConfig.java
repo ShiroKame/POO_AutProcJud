@@ -31,13 +31,16 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+        
             .authorizeHttpRequests(authorize -> authorize
+                .requestMatchers("admin/adminbdd/save").permitAll()
                 .requestMatchers("/public/**").permitAll()
                 .requestMatchers("/login").permitAll()
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 .requestMatchers("/user/**").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/firstboot/**").hasRole("ADMIN")
                 .requestMatchers("/h2-console/**").hasRole("ADMIN") // Permite el acceso a la consola H2
+                .requestMatchers("/").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
             )
@@ -52,6 +55,7 @@ public class SecurityConfig {
                 .userDetailsService(userDetailsService)
             )
             .logout(logout -> logout.permitAll())
+            
             .csrf(csrf -> csrf
                 .ignoringRequestMatchers("/h2-console/**") // Desactiva CSRF para la consola H2
             )

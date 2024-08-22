@@ -384,4 +384,17 @@ public class BddEditor {
         return "`" + tableName.replace("`", "``") + "`";
     }
       
+    public void updateTableRow(String tableName, Map<String, Object> rowData) {
+        // Implementa la lógica para construir y ejecutar la consulta SQL de actualización
+        String updateQuery = "UPDATE " + tableName + " SET ";
+    
+        List<String> setClauses = new ArrayList<>();
+        for (Map.Entry<String, Object> entry : rowData.entrySet()) {
+            setClauses.add(entry.getKey() + " = ?");
+        }
+    
+        updateQuery += String.join(", ", setClauses) + " WHERE id = ?"; // Considera usar una clave primaria como 'id'
+    
+        jdbcTemplate.update(updateQuery, rowData.values().toArray());
+    }
 }
