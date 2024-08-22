@@ -384,17 +384,78 @@ public class BddEditor {
         return "`" + tableName.replace("`", "``") + "`";
     }
       
-    public void updateTableRow(String tableName, Map<String, Object> rowData) {
-        // Implementa la lógica para construir y ejecutar la consulta SQL de actualización
-        String updateQuery = "UPDATE " + tableName + " SET ";
-    
-        List<String> setClauses = new ArrayList<>();
-        for (Map.Entry<String, Object> entry : rowData.entrySet()) {
-            setClauses.add(entry.getKey() + " = ?");
+    public void updateTableRow(String tableName, StringBuilder sb) {
+        String[] parts = sb.toString().split(", ");
+    StringBuilder updateQuery = new StringBuilder("UPDATE " + tableName + " SET ");
+    String radicado = null;
+
+    // Lista para almacenar los valores de los parámetros
+    List<Object> parameters = new ArrayList<>();
+
+    for (String part : parts) {
+        String[] keyval = part.split("=");
+        // Verificar si el array tiene dos partes
+        if (keyval.length == 2) {
+            String key = keyval[0];
+            String value = keyval[1];
+
+            // Si el valor está vacío, asignar " " en lugar de una cadena vacía
+            if (value.isEmpty()) {
+                value = " ";
+            }
+            if (key.equals("RADICADO") && !value.isEmpty() && !value.equals(" ")) {
+                radicado = value; // Guardar el valor de RADICADO
+            } else {
+                // Añadir cláusulas SET para las demás columnas
+                updateQuery.append(key).append(" = ?, ");
+                parameters.add(value);
+            }
+        } else if (keyval.length == 1) {
+            String key = keyval[0];
+            String value = " ";
+            if (key.equals("ESTADO")) {
+                continue;
+            }
+            if (key.equals("RADICADO") && !value.isEmpty() && !value.equals(" ")) {
+                radicado = value; // Guardar el valor de RADICADO
+            } else {
+                // Añadir cláusulas SET para las demás columnas
+                updateQuery.append(key).append(" = ?, ");
+                parameters.add(value);
+            }
+        } else {
+            System.out.println("Input string is not in the expected format." + keyval.length);
         }
-    
-        updateQuery += String.join(", ", setClauses) + " WHERE id = ?"; // Considera usar una clave primaria como 'id'
-    
-        jdbcTemplate.update(updateQuery, rowData.values().toArray());
     }
+
+    // Comprobar si hemos encontrado un RADICADO válido
+    if (radicado != null) {
+        // Eliminar la última coma y espacio
+        updateQuery.setLength(updateQuery.length() - 2);
+        // Añadir la cláusula WHERE
+        updateQuery.append(" WHERE RADICADO = ?");
+        parameters.add(radicado);
+
+        // Convertir el StringBuilder a String
+        String sql = updateQuery.toString();
+
+        // Imprimir la consulta final y los parámetros exactos
+        System.out.println("Generated SQL Query: " + sql);
+        System.out.println("Parameters: " + parameters);
+
+        // Para imprimir los parámetros en el formato exacto
+        String formattedParams = parameters.stream()
+            .map(param -> param instanceof String ? "'" + ((String) param).replace("'", "''") + "'" : param.toString())
+            .collect(Collectors.joining(", ", "jdbcTemplate.update(\"" + sql + "\", ", ")"));
+
+        System.out.println("SQL Query and Parameters for Debug:");
+        System.out.println(formattedParams);
+
+        // Ejecutar la actualización con JdbcTemplate
+        jdbcTemplate.update(sql, parameters.toArray());
+    } else {
+        System.out.println("RADICADO value is missing or invalid.");
+    }
+    }
+    
 }

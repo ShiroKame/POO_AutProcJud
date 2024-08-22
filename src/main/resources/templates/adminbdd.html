@@ -7,7 +7,8 @@
     <title>Database Viewer</title>
 </head>
 <body>
-    <form id="dataForm" action="/admin/adminbdd/save" method="post">
+    <form id="dataForm" action="/admin/adminbdd/save" method="post" th:action="@{/admin/adminbdd/save}">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
         <table id="dataTable">
             <thead>
                 <tr>
@@ -16,50 +17,18 @@
             </thead>
             <tbody>
                 <tr th:each="row, rowIndex : ${rows}">
-                    <input type="hidden" name="rowIndex" th:value="${rowIndex}"/>
                     <td th:each="column : ${columns}">
-                        <input type="text" 
-                            th:name="${column}" 
+                        <input 
+                            type="text"
+                            th:with="index=${rowIndex.index}"
+                            th:name="${index} + '_' + ${column}"
                             th:value="${row.get(column)}"
                             th:readonly="${column == 'RADICADO'}" >
                     </td>
                 </tr>
             </tbody> 
         </table>
-        <button type="button" onclick="submitTableData()" class="btn btn-primary">Guardar</button>
+        <button type="submit" class="btn btn-primary">Guardar</button>
     </form>
-
-    <script>
-        function submitTableData() {
-            var form = document.getElementById('dataForm');
-            var table = document.getElementById('dataTable');
-            var rows = table.querySelectorAll('tbody tr');
-            var tableData = [];
-
-            rows.forEach(row => {
-                var rowData = {};
-                var inputs = row.querySelectorAll('input[type="text"]');
-                inputs.forEach(input => {
-                    rowData[input.name] = input.value;
-                });
-                tableData.push(rowData);
-            });
-
-            fetch(form.action, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(tableData)
-            })
-            .then(response => response.text())
-            .then(result => {
-                console.log(result);
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-        }
-    </script>
 </body>
 </html>

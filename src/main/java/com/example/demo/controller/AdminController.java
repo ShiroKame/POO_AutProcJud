@@ -30,6 +30,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.IntStream;
 
 @Controller
 @RequestMapping("/admin")
@@ -164,6 +165,9 @@ public class AdminController {
 
         model.addAttribute("columns", columns);
         model.addAttribute("rows", normalizedRows);
+        model.addAttribute("rowIndexes", IntStream.range(0, normalizedRows.size())
+        .boxed()
+        .collect(Collectors.toList()));
 
         return "adminbdd";
     }
@@ -207,37 +211,49 @@ public class AdminController {
     
     // En su lugar, usamos  para recibir el formulario entero como un JSON.
     @PostMapping("/adminbdd/save")
-    public ResponseEntity<String> saveTableData(@RequestBody List<Map<String, String>> tableData) {
-        // Procesar los datos de la tabla
-        System.out.println("Datos de la tabla recibidos: " + tableData);
-        return ResponseEntity.ok("Datos guardados con éxito");
+    public String saveTableData(@RequestParam Map<String, String> allParams) {
+        Map<String, Map<String, String>> groupedData = new LinkedHashMap<>();
+    
+    // Recorrer los parámetros
+    for (Map.Entry<String, String> entry : allParams.entrySet()) {
+        String key = entry.getKey();
+        String value = entry.getValue();
+
+        // Encontrar el subíndice
+        String subIndex = key.split("_")[0] + "_";
+        String column = key.substring(subIndex.length());
+
+        // Agregar al mapa de datos agrupados
+        groupedData.computeIfAbsent(subIndex, k -> new LinkedHashMap<>()).put(column, value);
     }
-    @PostMapping("/save")
-    public ResponseEntity<String> saveTableDataa(@RequestBody List<Map<String, String>> tableData) {
-        // Procesar los datos de la tabla
-        System.out.println("Datos de la tabla recibidos: " + tableData);
-        return ResponseEntity.ok("Datos guardados con éxito");
+
+    // Imprimir los datos agrupados
+    for (Map.Entry<String, Map<String, String>> entry : groupedData.entrySet()) {
+        String subIndex = entry.getKey(); // El subíndice (por ejemplo, "0_", "1_")
+        Map<String, String> values = entry.getValue();
+
+        // Crear un StringBuilder para construir la cadena de valores
+        StringBuilder sb = new StringBuilder();
+
+        // Añadir los pares columna-valor
+        values.forEach((column, value) -> sb.append(column).append("=").append(value).append(", "));
+        
+        // Eliminar la última coma y espacio
+        if (sb.length() > 0 && sb.length() > 2) {
+            sb.setLength(sb.length() - 2);
+        }
+
+        // Imprimir la cadena construida sin el subíndice
+        //System.out.println(sb.toString());
+        bddEditor.updateTableRow("YOUR_TABLE", sb);
     }
-    @PostMapping("/admin/adminbdd/save")
-    public ResponseEntity<String> saveTableDatab(@RequestBody List<Map<String, String>> tableData) {
-        // Procesar los datos de la tabla
-        System.out.println("Datos de la tabla recibidos: " + tableData);
-        return ResponseEntity.ok("Datos guardados con éxito");
-    }
-    @PostMapping("/admin/schedule-settings")
-    public String updateSchedule(
-        @RequestParam("scheduledTime") String scheduledTime,
-        @RequestParam("daysOfWeek") List<String> daysOfWeek,
-        Model model
-    ) {
-        // Actualizar la configuración del cron en WebScrapper
-        webScrapper.updateCronExpression(scheduledTime, daysOfWeek);
-        model.addAttribute("successMessage", "Configuración guardada exitosamente.");
-        System.out.println("ASDAFGDSF123456");
-        return "redirect:/admin/accesspanel"; // Redirige al panel de acceso
+        
+    
+        // Redirigir o devolver una vista
+        return "redirect:/admin/adminbdd";
     }
     @PostMapping("/schedule-settings")
-    public String updateSchedule1(
+    public String updateSchedule(
         @RequestParam("scheduledTime") String scheduledTime,
         @RequestParam("daysOfWeek") List<String> daysOfWeek,
         Model model
