@@ -9,12 +9,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ScheduledFuture;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Service;
+
+import javax.annotation.PostConstruct;
 
 @Service
 public class WebScrapper {
@@ -22,6 +27,41 @@ public class WebScrapper {
     private BddEditor bddEditor;
 
     private static final String USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36";
+
+    @Autowired
+    private TaskScheduler taskScheduler;
+
+    private ScheduledFuture<?> scheduledTask;
+    private String cronExpression = "0 0 5 * * ?"; // Valor por defecto
+
+    // Método para actualizar el cron de manera dinámica
+    public void updateCronExpression(String scheduledTime, List<String> daysOfWeek) {
+        String[] timeParts = scheduledTime.split(":");
+        String cronHours = timeParts[0];
+        String cronMinutes = timeParts[1];
+
+        String cronDays = String.join(",", daysOfWeek);
+        cronExpression = String.format("0 %s %s ? * %s", cronMinutes, cronHours, cronDays);
+
+        // Reprogramar la tarea
+        if (scheduledTask != null) {
+            scheduledTask.cancel(true);
+        }
+        scheduleTask();
+    }
+
+    @PostConstruct
+    private void scheduleTask() {
+        scheduledTask = taskScheduler.schedule(() -> scheduledProcesarBdd(), new CronTrigger(cronExpression));
+    }
+
+    public void scheduledProcesarBdd() {
+        try {
+            procesarBdd();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     public Map<String, Object> queryProcess(String number) throws Exception {
         String radNumber = number;
@@ -126,14 +166,6 @@ public class WebScrapper {
             System.out.println("contador:"+contador);
         }
     }
-    @Scheduled(cron = "0 0 5 * * ?")
-    public void scheduledProcesarBdd() {
-        try {
-            procesarBdd();
-        } catch (Exception e) {
-            // Manejo de excepciones
-            e.printStackTrace();
-        }
-    }
+
 }
 

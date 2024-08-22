@@ -224,5 +224,29 @@ public class AdminController {
         System.out.println("Datos de la tabla recibidos: " + tableData);
         return ResponseEntity.ok("Datos guardados con éxito");
     }
+    @PostMapping("/admin/schedule-settings")
+    public String updateSchedule(
+        @RequestParam("scheduledTime") String scheduledTime,
+        @RequestParam("daysOfWeek") List<String> daysOfWeek,
+        Model model
+    ) {
+        // Actualizar la configuración del cron en WebScrapper
+        webScrapper.updateCronExpression(scheduledTime, daysOfWeek);
+        model.addAttribute("successMessage", "Configuración guardada exitosamente.");
+        System.out.println("ASDAFGDSF123456");
+        return "redirect:/admin/accesspanel"; // Redirige al panel de acceso
+    }
+    @PostMapping("/schedule-settings")
+    public String updateSchedule1(
+        @RequestParam("scheduledTime") String scheduledTime,
+        @RequestParam("daysOfWeek") List<String> daysOfWeek,
+        Model model
+    ) {
+        // Actualizar la configuración del cron en WebScrapper
+        webScrapper.updateCronExpression(scheduledTime, daysOfWeek);
+        model.addAttribute("successMessage", "Configuración guardada exitosamente.");
+        System.out.println("ASDAFGDSF");
+        return "redirect:/admin/accesspanel"; // Redirige al panel de acceso
+    }
 }
     

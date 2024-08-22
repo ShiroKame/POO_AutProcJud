@@ -164,44 +164,33 @@
       <!-- Regresar -->
       <a href="/admin" class="btn btn-primary mt-3">Volver al Inicio</a>
     </div>
-
-    <script>
-      const dropZone = document.getElementById('dropZone')
-      const fileInput = document.getElementById('fileInput')
-      const uploadForm = document.getElementById('uploadForm')
-
-      // Abrir el selector de archivos cuando se hace clic en la zona de arrastrar y soltar
-      dropZone.addEventListener('click', () => fileInput.click())
-
-      // Manejar el evento de arrastrar y soltar
-      dropZone.addEventListener('dragover', (e) => {
-        e.preventDefault()
-        dropZone.classList.add('dragover')
-      })
-
-      dropZone.addEventListener('dragleave', () =>
-        dropZone.classList.remove('dragover')
-      )
-
-      dropZone.addEventListener('drop', (e) => {
-        e.preventDefault()
-        dropZone.classList.remove('dragover')
-        const files = e.dataTransfer.files
-        if (files.length > 0) {
-          fileInput.files = files
-
-          // Actualizar el texto de la zona con el nombre del archivo seleccionado
-          dropZone.textContent = `Archivo seleccionado: ${fileInput.files[0].name}`
-        }
-      })
-
-      // Actualizar el texto de la zona con el nombre del archivo seleccionado si se elige manualmente
-      fileInput.addEventListener('change', () => {
-        if (fileInput.files.length > 0) {
-          dropZone.textContent = `Archivo seleccionado: ${fileInput.files[0].name}`
-        }
-      })
-    </script>
-    <script src="/public/bootstrap/js/bootstrap.js"></script>
+    <h2 class="mt-4">Configurar Ejecución Automática</h2>
+    
+  <form action="/admin/schedule-settings" method="post" th:action="@{/admin/schedule-settings}">
+    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+    
+    <div class="mb-3">
+      <label for="scheduledTime" class="form-label">Hora de Ejecución (Formato 24h):</label>
+      <input type="time" id="scheduledTime" name="scheduledTime" class="form-control border border-primary" required />
+    </div>
+    
+    <div class="mb-3">
+      <label for="daysOfWeek" class="form-label">Días de la Semana:</label>
+      <select id="daysOfWeek" name="daysOfWeek" class="form-select border border-primary" multiple required>
+        <option value="1">Lunes</option>
+        <option value="2">Martes</option>
+        <option value="3">Miércoles</option>
+        <option value="4">Jueves</option>
+        <option value="5">Viernes</option>
+        <option value="6">Sábado</option>
+        <option value="7">Domingo</option>
+      </select>
+      <small class="form-text text-muted">Mantén presionada la tecla Ctrl (Cmd en Mac) para seleccionar múltiples días.</small>
+    </div>
+    
+    <div class="mb-3">
+      <input type="submit" value="Guardar Configuración" class="btn btn-primary" />
+    </div>
+  </form>
   </body>
 </html>
