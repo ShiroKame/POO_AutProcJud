@@ -403,6 +403,10 @@ public class BddEditor {
             if (value.isEmpty()) {
                 value = " ";
             }
+
+            if (key.equals("ESTADO")) {
+                continue;
+            }
             if (key.equals("RADICADO") && !value.isEmpty() && !value.equals(" ")) {
                 radicado = value; // Guardar el valor de RADICADO
             } else {
