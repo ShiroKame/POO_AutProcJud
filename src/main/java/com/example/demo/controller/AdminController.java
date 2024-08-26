@@ -2,10 +2,6 @@ package com.example.demo.controller;
 
 import com.example.demo.service.BddEditor;
 import com.example.demo.service.WebScrapper;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import jakarta.servlet.http.HttpServletRequest;
 
 import com.example.demo.model.Role;
 import com.example.demo.model.Solicitud;
@@ -17,19 +13,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.annotation.RequestScope;
-import org.springframework.http.ResponseEntity;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 
 @Controller
@@ -229,7 +219,6 @@ public class AdminController {
 
     // Imprimir los datos agrupados
     for (Map.Entry<String, Map<String, String>> entry : groupedData.entrySet()) {
-        String subIndex = entry.getKey(); // El subíndice (por ejemplo, "0_", "1_")
         Map<String, String> values = entry.getValue();
 
         // Crear un StringBuilder para construir la cadena de valores
